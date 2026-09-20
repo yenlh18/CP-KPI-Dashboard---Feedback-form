@@ -1,6 +1,9 @@
 import { getSql } from "@/lib/db";
 import type { BugRow, FeedbackRow } from "@/lib/types";
 import AdminSummarize from "@/components/AdminSummarize";
+import { copy } from "@/lib/copy";
+
+const q = copy.vi;
 
 export const dynamic = "force-dynamic";
 
@@ -76,13 +79,14 @@ export default async function AdminPage() {
             <thead className="bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500">
               <tr>
                 <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Domain</th>
-                <th className="px-3 py-2">Overall</th>
-                <th className="px-3 py-2">Submit</th>
-                <th className="px-3 py-2">KPI clarity</th>
-                <th className="px-3 py-2">Score clarity</th>
-                <th className="px-3 py-2">New KPI flow</th>
-                <th className="px-3 py-2">Notes</th>
+                <th className="px-3 py-2 min-w-[140px]">{q.q_dept}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_overall}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_ease_submit}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_kpi}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_score}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_change_flow}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_overall_feedback}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_change_note}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
@@ -106,15 +110,16 @@ export default async function AdminPage() {
                     <Score v={r.change_flow} />
                   </td>
                   <td className="max-w-xs px-3 py-2 text-neutral-600">
-                    {[r.overall_feedback, r.change_note].filter(Boolean).join(" | ") || (
-                      <span className="text-neutral-400">—</span>
-                    )}
+                    {r.overall_feedback || <span className="text-neutral-400">—</span>}
+                  </td>
+                  <td className="max-w-xs px-3 py-2 text-neutral-600">
+                    {r.change_note || <span className="text-neutral-400">—</span>}
                   </td>
                 </tr>
               ))}
               {feedback.length === 0 && !dbError && (
                 <tr>
-                  <td colSpan={8} className="px-3 py-6 text-center text-neutral-400">
+                  <td colSpan={9} className="px-3 py-6 text-center text-neutral-400">
                     No feedback yet.
                   </td>
                 </tr>
@@ -142,9 +147,9 @@ export default async function AdminPage() {
             <thead className="bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500">
               <tr>
                 <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Domain</th>
-                <th className="px-3 py-2">Screens</th>
-                <th className="px-3 py-2">Issue</th>
+                <th className="px-3 py-2 min-w-[140px]">{q.bug_domain}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.bug_where}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.bug_issue}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
