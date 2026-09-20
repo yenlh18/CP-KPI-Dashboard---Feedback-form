@@ -139,6 +139,53 @@ function LabelBlock({
   );
 }
 
+function Shell({
+  children,
+  compactHero = false,
+  lang,
+  setLangState,
+  badge,
+}: {
+  children: React.ReactNode;
+  compactHero?: boolean;
+  lang: Lang;
+  setLangState: (l: Lang) => void;
+  badge: string;
+}) {
+  return (
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-16">
+      <div className="flex items-center justify-between mb-4">
+        <span className="badge">✨ {badge}</span>
+        <div className="lang-toggle" role="tablist" aria-label="Language">
+          <button
+            role="tab"
+            aria-selected={lang === "vi"}
+            className={lang === "vi" ? "active" : ""}
+            onClick={() => setLangState("vi")}
+          >
+            VI
+          </button>
+          <button
+            role="tab"
+            aria-selected={lang === "en"}
+            className={lang === "en" ? "active" : ""}
+            onClick={() => setLangState("en")}
+          >
+            EN
+          </button>
+        </div>
+      </div>
+      <header className={`hero mb-6 ${compactHero ? "compact" : ""}`}>
+        <Image src="/header.jpg" alt="CP KPI Dashboard" width={1600} height={600} priority className="w-full h-auto" />
+      </header>
+      {children}
+      <footer className="mt-10 text-center text-xs" style={{ color: "var(--ink-3)" }}>
+        CP KPI Dashboard — Corporate Platforms
+      </footer>
+    </div>
+  );
+}
+
 export default function FeedbackApp() {
   const [lang, setLangState] = useState<Lang>("vi");
   const [view, setView] = useState<View>("landing");
@@ -240,45 +287,10 @@ export default function FeedbackApp() {
     }
   }
 
-  function Shell({ children, compactHero = false }: { children: React.ReactNode; compactHero?: boolean }) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-16">
-        <div className="flex items-center justify-between mb-4">
-          <span className="badge">✨ {c.badge}</span>
-          <div className="lang-toggle" role="tablist" aria-label="Language">
-            <button
-              role="tab"
-              aria-selected={lang === "vi"}
-              className={lang === "vi" ? "active" : ""}
-              onClick={() => setLangState("vi")}
-            >
-              VI
-            </button>
-            <button
-              role="tab"
-              aria-selected={lang === "en"}
-              className={lang === "en" ? "active" : ""}
-              onClick={() => setLangState("en")}
-            >
-              EN
-            </button>
-          </div>
-        </div>
-        <header className={`hero mb-6 ${compactHero ? "compact" : ""}`}>
-          <Image src="/header.jpg" alt="CP KPI Dashboard" width={1600} height={600} priority className="w-full h-auto" />
-        </header>
-        {children}
-        <footer className="mt-10 text-center text-xs" style={{ color: "var(--ink-3)" }}>
-          CP KPI Dashboard — Corporate Platforms
-        </footer>
-      </div>
-    );
-  }
-
   // ---------- Landing ----------
   if (view === "landing") {
     return (
-      <Shell>
+      <Shell lang={lang} setLangState={setLangState} badge={c.badge}>
         <section className="step-enter">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3" style={{ color: "var(--ink)" }}>
             {c.landingTitle}
@@ -347,7 +359,7 @@ export default function FeedbackApp() {
     const canAdvance = step === 0 ? step0Valid : true;
 
     return (
-      <Shell compactHero>
+      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
         <section className="step-enter" key={`s${step}`}>
           <div className="mb-6">
             <div className="flex items-center justify-between text-xs mb-2" style={{ color: "var(--ink-3)" }}>
@@ -502,7 +514,7 @@ export default function FeedbackApp() {
   // ---------- Bug report ----------
   if (view === "bug") {
     return (
-      <Shell compactHero>
+      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
         <section className="step-enter">
           <div className="mb-6">
             <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: "var(--ink)" }}>
@@ -576,7 +588,7 @@ export default function FeedbackApp() {
   // ---------- Thanks ----------
   const isBug = thanksKind === "bug";
   return (
-    <Shell compactHero>
+    <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
       <section className="step-enter text-center">
         <div className="card p-8 sm:p-12">
           {!isBug && <div className="text-6xl mb-4">🌟</div>}
