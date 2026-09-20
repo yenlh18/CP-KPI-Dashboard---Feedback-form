@@ -19,7 +19,11 @@ async function getData() {
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+  return new Date(iso).toLocaleString("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
 }
 
 function Score({ v }: { v: number | null }) {

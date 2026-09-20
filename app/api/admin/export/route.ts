@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import type { BugRow, FeedbackRow } from "@/lib/types";
 
+function fmtDateForCsv(iso: string): string {
+  return new Date(iso).toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
+}
+
+function withGmt7Dates<T extends { created_at: string }>(rows: T[]): Record<string, unknown>[] {
+  return rows.map((row) => ({ ...row, created_at: fmtDateForCsv(row.created_at) }));
+}
+
 function csvEscape(value: unknown): string {
   if (value === null || value === undefined) return "";
   const s = Array.isArray(value) ? value.join("; ") : String(value);
@@ -31,7 +39,7 @@ export async function GET(req: NextRequest) {
         select id, created_at, lang, issue, where_tags, domain
         from bug_reports order by created_at desc
       `) as unknown as BugRow[];
-      const csv = toCsv(rows as unknown as Record<string, unknown>[]);
+      const csv = toCsv(withGmt7Dates(rows));
       return new NextResponse(csv, {
         headers: {
           "Content-Type": "text/csv; charset=utf-8",
@@ -45,7 +53,7 @@ export async function GET(req: NextRequest) {
              ease_submit, clarity_kpi, clarity_score, change_flow, change_note
       from feedback_responses order by created_at desc
     `) as unknown as FeedbackRow[];
-    const csv = toCsv(rows as unknown as Record<string, unknown>[]);
+    const csv = toCsv(withGmt7Dates(rows));
     return new NextResponse(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
