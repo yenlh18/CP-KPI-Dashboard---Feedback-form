@@ -1,0 +1,194 @@
+export type Lang = "vi" | "en";
+
+export const copy = {
+  vi: {
+    langLabel: "VI",
+    otherLang: "EN",
+    badge: "Feedback từ Anh/Chị",
+    landingTitle: "Cảm ơn Anh/Chị đã dành thời gian sử dụng CP KPI Dashboard",
+    landingSub:
+      "Những góp ý của Anh/Chị sẽ giúp team hiểu điểm nào đang hoạt động tốt và điểm nào cần cải thiện, để Dashboard ngày càng hữu ích hơn cho các kỳ cập nhật tiếp theo.",
+    cardBugTitle: "Báo lỗi nhanh",
+    cardBugDesc: "Gặp lỗi cần team kiểm tra ngay? Gửi cho team biết.",
+    cardBugCta: "Báo lỗi",
+    cardFbTitle: "Chia sẻ cảm nhận",
+    cardFbDesc: "Cho team biết trải nghiệm dùng Dashboard — chỉ mất 2 phút.",
+    cardFbCta: "Gửi feedback",
+    contactLabel: "Liên hệ để hỗ trợ:",
+    contactPeople: "YenLH5 · TraLT",
+    back: "Quay lại",
+    next: "Tiếp theo",
+    submit: "Gửi phản hồi",
+    submitBug: "Gửi báo lỗi",
+    submitting: "Đang gửi…",
+    optional: "(không bắt buộc)",
+    stepOf: (a: number, b: number) => `Bước ${a} / ${b}`,
+    thanksTitleFb: "Cảm ơn Anh/Chị rất nhiều! 🙏",
+    thanksSubFb:
+      "Mỗi góp ý của Anh/Chị đều được team đọc và cân nhắc kỹ để Dashboard ngày càng thuận tiện và hữu ích hơn trong các kỳ cập nhật tiếp theo.",
+    thanksTitleBug: "Đã ghi nhận báo lỗi! 🛠",
+    thanksSubBug:
+      "Team sẽ kiểm tra và phản hồi Anh/Chị sớm nhất có thể.\nCảm ơn Anh/Chị đã gửi thông tin.",
+    thanksBack: "Về trang đầu",
+    errorGeneric: "Có lỗi xảy ra, Anh/Chị vui lòng thử lại.",
+
+    step1Title: "Về Anh/Chị & Cảm nhận chung",
+    step1Sub: "Đôi nét về Anh/Chị và cảm nhận tổng thể sau khi dùng Dashboard.",
+    step2Title: "Các bước sử dụng chính",
+    step2Sub: "Cập nhật kết quả KPI và thêm KPI / Milestone mới.",
+
+    q_dept: "Domain của Anh/Chị",
+    q_dept_ph: "Ví dụ: HR, S&I, DTO…",
+    q_overall: "Nhìn chung, trải nghiệm dùng Dashboard trong kỳ vừa rồi thế nào?",
+    q_overall_feedback:
+      "Anh/Chị có góp ý gì để cải thiện Dashboard? (tính năng cần thêm, tính năng cần cải thiện, tính năng không cần thiết, …)",
+    q_overall_feedback_ph: "Chia sẻ góp ý của Anh/Chị…",
+
+    section1Title: "Section 1 — Cập nhật kết quả KPI",
+    section2Title: "Section 2 — Thêm KPI / Milestone mới",
+    q_ease_submit: "Việc nhập kết quả KPI hàng tháng (Submit Results) có dễ thực hiện không?",
+    q_clarity_kpi:
+      "Anh/Chị có nắm được cần nhập gì cho từng loại KPI (Milestone, Score, Pass/Fail, Progress, Assessment) không?",
+    q_clarity_score: "Cách hệ thống tính điểm KPI và tổng hợp kết quả phòng ban có dễ hiểu không?",
+    q_change_flow:
+      "Khi cần thêm KPI hoặc Milestone mới, các bước nhập thông tin và gửi yêu cầu có rõ ràng không?",
+    q_change_note: "Anh/Chị có góp ý gì để việc cập nhật và thêm mới KPI thuận tiện hơn?",
+    q_change_note_ph: "Chia sẻ thêm nếu có…",
+
+    bugTitle: "Báo lỗi nhanh",
+    bugSub: "Team cần vài thông tin để tái tạo và xử lý lỗi nhanh nhất. Cảm ơn Anh/Chị.",
+    bug_issue: "Anh/Chị đang gặp vấn đề gì?",
+    bug_issue_ph: "Mô tả ngắn gọn điều xảy ra — càng cụ thể càng tốt.",
+    bug_where: "Xảy ra ở màn hình nào? (chọn nhiều nếu cần)",
+    bug_where_opts: [
+      "Submit Results",
+      "Edit KPIs",
+      "Dashboard",
+      "Kira",
+      "Notifications",
+      "Đăng nhập / Truy cập",
+      "Khác",
+    ],
+    bug_screenshot: "Đính kèm ảnh chụp màn hình (không bắt buộc — chưa hỗ trợ trong bản demo này)",
+    bug_domain: "Domain của Anh/Chị để team hỗ trợ thêm",
+    bug_domain_ph: "Ví dụ: HR, S&I, DTO…",
+
+    scaleUseful: [
+      { v: 1, e: "😣", label: "Không tốt" },
+      { v: 2, e: "🙁", label: "Chưa tốt" },
+      { v: 3, e: "😐", label: "Bình thường" },
+      { v: 4, e: "🙂", label: "Tốt" },
+      { v: 5, e: "😄", label: "Rất tốt" },
+    ],
+    scaleEase: [
+      { v: 1, e: "😣", label: "Rất khó" },
+      { v: 2, e: "🙁", label: "Khó" },
+      { v: 3, e: "😐", label: "Bình thường" },
+      { v: 4, e: "🙂", label: "Dễ" },
+      { v: 5, e: "😄", label: "Rất dễ" },
+    ],
+    scaleClarity: [
+      { v: 1, e: "😣", label: "Rất khó hiểu" },
+      { v: 2, e: "🙁", label: "Chưa rõ" },
+      { v: 3, e: "😐", label: "Bình thường" },
+      { v: 4, e: "🙂", label: "Rõ" },
+      { v: 5, e: "😄", label: "Rất rõ" },
+    ],
+  },
+  en: {
+    langLabel: "EN",
+    otherLang: "VI",
+    badge: "Your feedback",
+    landingTitle: "Thank you for taking the time to use the CP KPI Dashboard",
+    landingSub:
+      "Your feedback will help the team understand what's working well and what needs improvement, so the Dashboard becomes more useful for the coming update cycles.",
+    cardBugTitle: "Report a bug",
+    cardBugDesc: "Something not working? Let the team know.",
+    cardBugCta: "Report a bug",
+    cardFbTitle: "Share feedback",
+    cardFbDesc: "Tell the team how the Dashboard felt to use — just 2 minutes.",
+    cardFbCta: "Give feedback",
+    contactLabel: "Reach out for support:",
+    contactPeople: "YenLH5 · TraLT",
+    back: "Back",
+    next: "Next",
+    submit: "Send feedback",
+    submitBug: "Send bug report",
+    submitting: "Sending…",
+    optional: "(optional)",
+    stepOf: (a: number, b: number) => `Step ${a} / ${b}`,
+    thanksTitleFb: "Thank you so much! 🙏",
+    thanksSubFb:
+      "Every piece of feedback is read and carefully considered so the Dashboard becomes more convenient and useful in the coming cycles.",
+    thanksTitleBug: "Bug logged 🛠",
+    thanksSubBug:
+      "The team will look into this and get back to you soon.\nThanks for sending the information.",
+    thanksBack: "Back to start",
+    errorGeneric: "Something went wrong, please try again.",
+
+    step1Title: "About you & overall feel",
+    step1Sub: "A few details about you and your overall experience.",
+    step2Title: "Core tasks",
+    step2Sub: "Updating KPI results and adding new KPIs / Milestones.",
+
+    q_dept: "Your domain",
+    q_dept_ph: "E.g. HR, S&I, DTO…",
+    q_overall: "Overall, how did using the Dashboard feel this cycle?",
+    q_overall_feedback:
+      "Any suggestions to improve the Dashboard? (features to add, features to improve, features that aren't needed, …)",
+    q_overall_feedback_ph: "Share your thoughts…",
+
+    section1Title: "Section 1 — Updating KPI results",
+    section2Title: "Section 2 — Adding new KPI / Milestone",
+    q_ease_submit: "How easy was it to enter your monthly KPI results (Submit Results)?",
+    q_clarity_kpi:
+      "Was it clear what to enter for each KPI type (Milestone, Score, Pass/Fail, Progress, Assessment)?",
+    q_clarity_score: "Was it clear how the system computes KPI scores and rolls them up to department results?",
+    q_change_flow:
+      "When you needed to add a new KPI or Milestone, were the steps to enter information and submit the request clear?",
+    q_change_note: "Any suggestions to make updating and adding KPIs more convenient?",
+    q_change_note_ph: "Share more if you'd like…",
+
+    bugTitle: "Report a bug",
+    bugSub: "A few details help the team reproduce and fix it faster. Thank you.",
+    bug_issue: "What's the problem?",
+    bug_issue_ph: "A short description of what happened — the more specific, the better.",
+    bug_where: "Where did it happen? (pick any)",
+    bug_where_opts: [
+      "Submit Results",
+      "Edit KPIs",
+      "Dashboard",
+      "Kira",
+      "Notifications",
+      "Sign-in / Access",
+      "Other",
+    ],
+    bug_screenshot: "Attach a screenshot (optional — not wired up in this demo)",
+    bug_domain: "Your domain so the team can follow up",
+    bug_domain_ph: "E.g. HR, S&I, DTO…",
+
+    scaleUseful: [
+      { v: 1, e: "😣", label: "Very poor" },
+      { v: 2, e: "🙁", label: "Poor" },
+      { v: 3, e: "😐", label: "Neutral" },
+      { v: 4, e: "🙂", label: "Good" },
+      { v: 5, e: "😄", label: "Very good" },
+    ],
+    scaleEase: [
+      { v: 1, e: "😣", label: "Very hard" },
+      { v: 2, e: "🙁", label: "Hard" },
+      { v: 3, e: "😐", label: "Neutral" },
+      { v: 4, e: "🙂", label: "Easy" },
+      { v: 5, e: "😄", label: "Very easy" },
+    ],
+    scaleClarity: [
+      { v: 1, e: "😣", label: "Very unclear" },
+      { v: 2, e: "🙁", label: "Unclear" },
+      { v: 3, e: "😐", label: "Neutral" },
+      { v: 4, e: "🙂", label: "Clear" },
+      { v: 5, e: "😄", label: "Very clear" },
+    ],
+  },
+} as const;
+
+export type Copy = typeof copy["vi"];
