@@ -503,7 +503,7 @@ export default function FeedbackApp() {
               </div>
 
               <div className="card p-5 sm:p-6 mb-4">
-                <LabelBlock text={c.q_start_clarity} optionalLabel={c.optional} />
+                <LabelBlock text={`1. ${c.q_start_clarity}`} />
                 <EmojiScale
                   value={feedback.startClarity}
                   onChange={(v) => setFeedback((f) => ({ ...f, startClarity: v }))}
@@ -511,7 +511,7 @@ export default function FeedbackApp() {
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
-                  <LabelBlock text={c.q_clarity_kpi} optionalLabel={c.optional} />
+                  <LabelBlock text={`2. ${c.q_clarity_kpi}`} />
                 </div>
                 <EmojiScale
                   value={feedback.clarityKpi}
@@ -520,7 +520,7 @@ export default function FeedbackApp() {
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
-                  <LabelBlock text={c.q_clarity_score} optionalLabel={c.optional} />
+                  <LabelBlock text={`3. ${c.q_clarity_score}`} />
                 </div>
                 <EmojiScale
                   value={feedback.clarityScore}
@@ -529,7 +529,7 @@ export default function FeedbackApp() {
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
-                  <LabelBlock text={c.q_change_flow} optionalLabel={c.optional} />
+                  <LabelBlock text={`4. ${c.q_change_flow}`} />
                 </div>
                 <EmojiScale
                   value={feedback.changeFlow}
@@ -538,7 +538,7 @@ export default function FeedbackApp() {
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
-                  <LabelBlock text={c.q_support_clarity} optionalLabel={c.optional} />
+                  <LabelBlock text={`5. ${c.q_support_clarity}`} />
                 </div>
                 <EmojiScale
                   value={feedback.supportClarity}
@@ -547,7 +547,7 @@ export default function FeedbackApp() {
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
-                  <LabelBlock text={c.q_time_saved} optionalLabel={c.optional} />
+                  <LabelBlock text={`6. ${c.q_time_saved}`} />
                 </div>
                 <EmojiScale
                   value={feedback.timeSaved}
@@ -557,7 +557,7 @@ export default function FeedbackApp() {
               </div>
 
               <div className="card p-5 sm:p-6">
-                <LabelBlock text={c.q_change_note} optionalLabel={c.optional} />
+                <LabelBlock text={c.q_change_note} />
                 <textarea
                   className="textarea mt-3"
                   rows={3}
