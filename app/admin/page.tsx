@@ -85,8 +85,8 @@ export default async function AdminPage() {
                 <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_kpi}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_score}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_change_flow}</th>
-                <th className="px-3 py-2 min-w-[220px]">{q.q_overall_feedback}</th>
-                <th className="px-3 py-2 min-w-[220px]">{q.q_change_note}</th>
+                <th className="px-3 py-2 min-w-[360px]">{q.q_overall_feedback}</th>
+                <th className="px-3 py-2 min-w-[360px]">{q.q_change_note}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
@@ -109,10 +109,10 @@ export default async function AdminPage() {
                   <td className="px-3 py-2">
                     <Score v={r.change_flow} />
                   </td>
-                  <td className="max-w-xs px-3 py-2 text-neutral-600">
+                  <td className="max-w-md px-3 py-2 text-neutral-600">
                     {r.overall_feedback || <span className="text-neutral-400">—</span>}
                   </td>
-                  <td className="max-w-xs px-3 py-2 text-neutral-600">
+                  <td className="max-w-md px-3 py-2 text-neutral-600">
                     {r.change_note || <span className="text-neutral-400">—</span>}
                   </td>
                 </tr>
