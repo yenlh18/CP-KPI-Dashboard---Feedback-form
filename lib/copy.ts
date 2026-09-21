@@ -5,7 +5,7 @@ export const copy = {
     langLabel: "VI",
     otherLang: "EN",
     badge: "Feedback từ Anh/Chị",
-    landingTitle: "Cảm ơn Anh/Chị đã dành thời gian sử dụng CP KPI Dashboard",
+    landingTitle: "Cảm ơn Anh/Chị đã sử dụng CP KPI Dashboard",
     landingSub:
       "Những góp ý của Anh/Chị sẽ giúp team hiểu điểm nào đang hoạt động tốt và điểm nào cần cải thiện, để Dashboard ngày càng hữu ích hơn cho các kỳ cập nhật tiếp theo.",
     cardBugTitle: "Báo lỗi nhanh",
