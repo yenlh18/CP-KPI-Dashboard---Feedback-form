@@ -450,7 +450,7 @@ export default function FeedbackApp() {
             <button
               className="landing-card card p-6 text-left"
               onClick={() => goto("training")}
-              style={{ background: "linear-gradient(135deg, rgba(240,90,34,0.06), rgba(236,146,36,0.04))" }}
+              style={{ background: "var(--card)", borderColor: "var(--brand)", borderWidth: 2 }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="text-3xl">🎓</div>
@@ -485,11 +485,7 @@ export default function FeedbackApp() {
                 {c.cardBugCta} →
               </div>
             </button>
-            <button
-              className="landing-card card p-6 text-left"
-              onClick={() => goto("feedback", { step: 0 })}
-              style={{ background: "linear-gradient(135deg, rgba(240,90,34,0.06), rgba(236,146,36,0.04))" }}
-            >
+            <button className="landing-card card p-6 text-left" onClick={() => goto("feedback", { step: 0 })}>
               <div className="flex items-start justify-between mb-3">
                 <div className="text-3xl">💬</div>
                 <span className="arrow text-xl" style={{ color: "var(--brand)" }}>
