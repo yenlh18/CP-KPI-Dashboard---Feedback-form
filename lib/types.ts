@@ -39,6 +39,33 @@ export const bugPayloadSchema = z.object({
 });
 export type BugPayload = z.infer<typeof bugPayloadSchema>;
 
+export const easeSkipSchema = z.number().int().min(0).max(5);
+
+export const trainingPayloadSchema = z
+  .object({
+    lang: z.enum(["vi", "en"]),
+    domain: z.string().trim().min(1).max(200),
+    easeSubmitResults: easeSkipSchema,
+    easeEditKpis: easeSkipSchema,
+    easeDeptScorecard: easeSkipSchema,
+    easeKira: easeSkipSchema,
+    wantsSupport: z.boolean(),
+    supportAreas: z.array(z.string()).max(20).optional().default([]),
+    supportOtherDetail: z.string().trim().max(2000).optional().default(""),
+    painPoint: z.string().trim().max(4000).optional().default(""),
+  })
+  .refine((data) => !data.wantsSupport || data.supportAreas.length > 0, {
+    message: "supportAreas is required when wantsSupport is true",
+    path: ["supportAreas"],
+  })
+  .refine(
+    (data) =>
+      (!data.supportAreas.includes("Khác") && !data.supportAreas.includes("Other")) ||
+      data.supportOtherDetail.trim() !== "",
+    { message: "supportOtherDetail is required when 'Khác'/'Other' is selected", path: ["supportOtherDetail"] }
+  );
+export type TrainingPayload = z.infer<typeof trainingPayloadSchema>;
+
 // Response record shapes, as read back from the database (for /admin).
 export interface FeedbackRow {
   id: string;
@@ -64,4 +91,19 @@ export interface BugRow {
   where_tags: string[];
   domain: string | null;
   screenshot_urls: string[];
+}
+
+export interface TrainingFeedbackRow {
+  id: string;
+  created_at: string;
+  lang: string;
+  domain: string;
+  ease_submit_results: number;
+  ease_edit_kpis: number;
+  ease_dept_scorecard: number;
+  ease_kira: number;
+  wants_support: boolean;
+  support_areas: string[];
+  support_other_detail: string | null;
+  pain_point: string | null;
 }

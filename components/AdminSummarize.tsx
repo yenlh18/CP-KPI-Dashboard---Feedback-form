@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function AdminSummarize({ kind }: { kind: "feedback" | "bug" }) {
+export default function AdminSummarize({ kind }: { kind: "feedback" | "bug" | "training" }) {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

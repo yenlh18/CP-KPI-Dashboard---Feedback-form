@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
-import type { BugRow, FeedbackRow } from "@/lib/types";
+import type { BugRow, FeedbackRow, TrainingFeedbackRow } from "@/lib/types";
 
 const ANTHROPIC_MODEL = "claude-sonnet-5";
 
@@ -13,13 +13,41 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const kind = (req.nextUrl.searchParams.get("kind") ?? "feedback") as "feedback" | "bug";
+  const kind = (req.nextUrl.searchParams.get("kind") ?? "feedback") as "feedback" | "bug" | "training";
 
   try {
     const sql = getSql();
     let promptData: string;
 
-    if (kind === "bug") {
+    if (kind === "training") {
+      const rows = (await sql`
+        select created_at, lang, domain, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
+               wants_support, support_areas, support_other_detail, pain_point
+        from training_feedback order by created_at desc limit 200
+      `) as unknown as TrainingFeedbackRow[];
+      if (rows.length === 0) {
+        return NextResponse.json({ error: "No training feedback to summarize yet." }, { status: 400 });
+      }
+      const easeLabel = (v: number) => (v === 0 ? "not tried" : `${v}/5`);
+      promptData = rows
+        .map((r, i) => {
+          const ease = [
+            `submit_results=${easeLabel(r.ease_submit_results)}`,
+            `edit_kpis=${easeLabel(r.ease_edit_kpis)}`,
+            `dept_scorecard=${easeLabel(r.ease_dept_scorecard)}`,
+            `kira=${easeLabel(r.ease_kira)}`,
+          ].join(", ");
+          const support = r.wants_support
+            ? `wants 1:1 support (areas: ${r.support_areas.join(", ") || "—"}${
+                r.support_other_detail ? `; other: ${r.support_other_detail}` : ""
+              })`
+            : "does not want 1:1 support";
+          return `${i + 1}. [${r.domain}] ease(0=not tried,1-5): ${ease}\n   ${support}${
+            r.pain_point ? `\n   pain point: ${r.pain_point}` : ""
+          }`;
+        })
+        .join("\n\n");
+    } else if (kind === "bug") {
       const rows = (await sql`
         select created_at, lang, issue, where_tags, domain
         from bug_reports order by created_at desc limit 200
@@ -66,6 +94,8 @@ export async function POST(req: NextRequest) {
     const systemPrompt =
       kind === "bug"
         ? "You are analyzing bug reports submitted by department heads for an internal KPI dashboard tool. Summarize the recurring themes, group similar issues, note which screens are most affected, and flag anything that sounds urgent or blocking. Write in English, using short sections with headers. Be concise and factual — do not invent details not present in the data."
+        : kind === "training"
+        ? "You are analyzing feedback from an internal KPI dashboard training session, submitted by department heads. Summarize: (1) which features people found easy vs. hard to use (and which were mostly untried), (2) how many want 1:1 follow-up support and on which areas, (3) recurring pain points or questions. Write in English, using short sections with headers. Be concise and factual — do not invent details not present in the data."
         : "You are analyzing user feedback submitted by department heads for an internal KPI dashboard tool. Summarize: (1) overall sentiment and score distribution, (2) top recurring themes in the open comments, (3) concrete quick-win suggestions worth prioritizing, (4) anything positive worth preserving. Write in English, using short sections with headers. Be concise and factual — do not invent details not present in the data.";
 
     const resp = await fetch("https://api.anthropic.com/v1/messages", {

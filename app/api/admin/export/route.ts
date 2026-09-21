@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
-import type { BugRow, FeedbackRow } from "@/lib/types";
+import type { BugRow, FeedbackRow, TrainingFeedbackRow } from "@/lib/types";
 
 function fmtDateForCsv(iso: string): string {
   return new Date(iso).toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
@@ -44,6 +44,21 @@ export async function GET(req: NextRequest) {
         headers: {
           "Content-Type": "text/csv; charset=utf-8",
           "Content-Disposition": `attachment; filename="bug_reports.csv"`,
+        },
+      });
+    }
+
+    if (kind === "training") {
+      const rows = (await sql`
+        select id, created_at, lang, domain, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
+               wants_support, support_areas, support_other_detail, pain_point
+        from training_feedback order by created_at desc
+      `) as unknown as TrainingFeedbackRow[];
+      const csv = toCsv(withGmt7Dates(rows));
+      return new NextResponse(csv, {
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="training_feedback.csv"`,
         },
       });
     }

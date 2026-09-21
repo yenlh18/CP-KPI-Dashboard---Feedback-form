@@ -44,5 +44,22 @@ alter table bug_reports add column if not exists screenshot_urls text[] not null
 update bug_reports set screenshot_urls = array[to_jsonb(bug_reports) ->> 'screenshot_url'] where (to_jsonb(bug_reports) ->> 'screenshot_url') is not null and coalesce(array_length(screenshot_urls, 1), 0) = 0;
 alter table bug_reports drop column if exists screenshot_url;
 
+create table if not exists training_feedback (
+  id                     uuid primary key default gen_random_uuid(),
+  created_at             timestamptz not null default now(),
+  lang                   text not null,
+  domain                 text not null,
+  ease_submit_results    smallint not null check (ease_submit_results between 0 and 5),
+  ease_edit_kpis         smallint not null check (ease_edit_kpis between 0 and 5),
+  ease_dept_scorecard    smallint not null check (ease_dept_scorecard between 0 and 5),
+  ease_kira              smallint not null check (ease_kira between 0 and 5),
+  wants_support          boolean not null,
+  support_areas          text[] not null default '{}',
+  support_other_detail   text,
+  pain_point             text,
+  user_agent             text
+);
+
 create index if not exists feedback_responses_created_at_idx on feedback_responses (created_at desc);
 create index if not exists bug_reports_created_at_idx on bug_reports (created_at desc);
+create index if not exists training_feedback_created_at_idx on training_feedback (created_at desc);

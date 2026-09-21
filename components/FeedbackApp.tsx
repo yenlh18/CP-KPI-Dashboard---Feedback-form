@@ -14,8 +14,8 @@ interface Screenshot {
   name: string;
 }
 
-type View = "landing" | "feedback" | "bug" | "thanks";
-type ThanksKind = "feedback" | "bug";
+type View = "landing" | "feedback" | "bug" | "training" | "thanks";
+type ThanksKind = "feedback" | "bug" | "training";
 
 interface FeedbackFormState {
   dept: string;
@@ -35,6 +35,18 @@ interface BugFormState {
   whereTags: string[];
   domain: string;
   screenshots: Screenshot[];
+}
+
+interface TrainingFormState {
+  dept: string;
+  easeSubmitResults: number | null;
+  easeEditKpis: number | null;
+  easeDeptScorecard: number | null;
+  easeKira: number | null;
+  wantsSupport: boolean | null;
+  supportAreas: string[];
+  supportOtherDetail: string;
+  painPoint: string;
 }
 
 const FEEDBACK_STEPS = 2;
@@ -58,6 +70,18 @@ const emptyBug: BugFormState = {
   whereTags: [],
   domain: "",
   screenshots: [],
+};
+
+const emptyTraining: TrainingFormState = {
+  dept: "",
+  easeSubmitResults: null,
+  easeEditKpis: null,
+  easeDeptScorecard: null,
+  easeKira: null,
+  wantsSupport: null,
+  supportAreas: [],
+  supportOtherDetail: "",
+  painPoint: "",
 };
 
 function fireConfetti(subtle = false) {
@@ -85,13 +109,15 @@ function EmojiScale({
   value,
   onChange,
   options,
+  compact = false,
 }: {
   value: number | null;
   onChange: (v: number) => void;
   options: readonly { v: number; e: string; label: string }[];
+  compact?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-5 gap-1 sm:gap-2 mt-3">
+    <div className={compact ? "grid grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2 mt-3" : "grid grid-cols-5 gap-1 sm:gap-2 mt-3"}>
       {options.map((o) => (
         <button
           key={o.v}
@@ -213,6 +239,7 @@ export default function FeedbackApp() {
   const [thanksKind, setThanksKind] = useState<ThanksKind>("feedback");
   const [feedback, setFeedback] = useState<FeedbackFormState>(emptyFeedback);
   const [bug, setBug] = useState<BugFormState>(emptyBug);
+  const [training, setTraining] = useState<TrainingFormState>(emptyTraining);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [screenshotUploading, setScreenshotUploading] = useState(false);
@@ -245,6 +272,7 @@ export default function FeedbackApp() {
   function reset() {
     setFeedback(emptyFeedback);
     setBug(emptyBug);
+    setTraining(emptyTraining);
     setStep(0);
     setError(null);
     setScreenshotError(null);
@@ -254,6 +282,17 @@ export default function FeedbackApp() {
 
   const step0Valid = feedback.dept.trim() !== "" && feedback.overall !== null;
   const bugValid = bug.issue.trim() !== "";
+
+  const trainingOtherLabel = c.tr_support_areas_opts[c.tr_support_areas_opts.length - 1];
+  const trainingValid =
+    training.dept.trim() !== "" &&
+    training.easeSubmitResults !== null &&
+    training.easeEditKpis !== null &&
+    training.easeDeptScorecard !== null &&
+    training.easeKira !== null &&
+    training.wantsSupport !== null &&
+    (training.wantsSupport === false || training.supportAreas.length > 0) &&
+    (!training.supportAreas.includes(trainingOtherLabel) || training.supportOtherDetail.trim() !== "");
 
   async function submitFeedback() {
     if (submitting) return;
@@ -307,6 +346,38 @@ export default function FeedbackApp() {
       if (!res.ok) throw new Error(await res.text());
       fireConfetti(true);
       goto("thanks", { thanksKind: "bug" });
+    } catch (err) {
+      console.error(err);
+      setError(c.errorGeneric);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function submitTraining() {
+    if (submitting || !trainingValid) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/training-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lang,
+          domain: training.dept,
+          easeSubmitResults: training.easeSubmitResults,
+          easeEditKpis: training.easeEditKpis,
+          easeDeptScorecard: training.easeDeptScorecard,
+          easeKira: training.easeKira,
+          wantsSupport: training.wantsSupport,
+          supportAreas: training.supportAreas,
+          supportOtherDetail: training.supportOtherDetail,
+          painPoint: training.painPoint,
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      fireConfetti();
+      goto("thanks", { thanksKind: "training" });
     } catch (err) {
       console.error(err);
       setError(c.errorGeneric);
@@ -375,7 +446,28 @@ export default function FeedbackApp() {
             {c.landingSub}
           </p>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4">
+            <button
+              className="landing-card card p-6 text-left"
+              onClick={() => goto("training")}
+              style={{ background: "linear-gradient(135deg, rgba(240,90,34,0.06), rgba(236,146,36,0.04))" }}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="text-3xl">🎓</div>
+                <span className="arrow text-xl" style={{ color: "var(--brand)" }}>
+                  →
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1" style={{ color: "var(--ink)" }}>
+                {c.cardTrainingTitle}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>
+                {c.cardTrainingDesc}
+              </p>
+              <div className="mt-4 text-sm font-semibold" style={{ color: "var(--brand)" }}>
+                {c.cardTrainingCta} →
+              </div>
+            </button>
             <button className="landing-card card p-6 text-left" onClick={() => goto("bug")}>
               <div className="flex items-start justify-between mb-3">
                 <div className="text-3xl">🐞</div>
@@ -714,21 +806,183 @@ export default function FeedbackApp() {
     );
   }
 
+  // ---------- Training feedback ----------
+  if (view === "training") {
+    return (
+      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
+        <section className="step-enter">
+          <div className="mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: "var(--ink)" }}>
+              🎓 {c.trainingTitle}
+            </h2>
+            <p className="text-sm sm:text-base" style={{ color: "var(--ink-2)" }}>
+              {c.trainingSub}
+            </p>
+          </div>
+
+          <div className="card p-5 sm:p-6 mb-4">
+            <LabelBlock text={c.q_dept} required />
+            <input
+              className="input mt-3"
+              type="text"
+              placeholder={c.q_dept_ph}
+              value={training.dept}
+              onChange={(e) => setTraining((t) => ({ ...t, dept: e.target.value }))}
+            />
+          </div>
+
+          <div className="card p-5 sm:p-6 mb-4">
+            <LabelBlock text={c.tr_features_question} required />
+
+            <div className="mt-4">
+              <div className="text-sm font-semibold mb-1" style={{ color: "var(--ink-2)" }}>
+                {c.tr_feature_submit_results}
+              </div>
+              <EmojiScale
+                compact
+                value={training.easeSubmitResults}
+                onChange={(v) => setTraining((t) => ({ ...t, easeSubmitResults: v }))}
+                options={c.scaleEaseSkip}
+              />
+            </div>
+            <div className="divider mt-5" />
+            <div className="mt-5">
+              <div className="text-sm font-semibold mb-1" style={{ color: "var(--ink-2)" }}>
+                {c.tr_feature_edit_kpis}
+              </div>
+              <EmojiScale
+                compact
+                value={training.easeEditKpis}
+                onChange={(v) => setTraining((t) => ({ ...t, easeEditKpis: v }))}
+                options={c.scaleEaseSkip}
+              />
+            </div>
+            <div className="divider mt-5" />
+            <div className="mt-5">
+              <div className="text-sm font-semibold mb-1" style={{ color: "var(--ink-2)" }}>
+                {c.tr_feature_dept_scorecard}
+              </div>
+              <EmojiScale
+                compact
+                value={training.easeDeptScorecard}
+                onChange={(v) => setTraining((t) => ({ ...t, easeDeptScorecard: v }))}
+                options={c.scaleEaseSkip}
+              />
+            </div>
+            <div className="divider mt-5" />
+            <div className="mt-5">
+              <div className="text-sm font-semibold mb-1" style={{ color: "var(--ink-2)" }}>
+                {c.tr_feature_kira}
+              </div>
+              <EmojiScale
+                compact
+                value={training.easeKira}
+                onChange={(v) => setTraining((t) => ({ ...t, easeKira: v }))}
+                options={c.scaleEaseSkip}
+              />
+            </div>
+          </div>
+
+          <div className="card p-5 sm:p-6 mb-4">
+            <LabelBlock text={c.tr_support_question} required />
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <button
+                type="button"
+                className={`radio-card ${training.wantsSupport === true ? "selected" : ""}`}
+                onClick={() => setTraining((t) => ({ ...t, wantsSupport: true }))}
+              >
+                <span className="radio-dot" />
+                <span className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                  {c.tr_support_yes}
+                </span>
+              </button>
+              <button
+                type="button"
+                className={`radio-card ${training.wantsSupport === false ? "selected" : ""}`}
+                onClick={() =>
+                  setTraining((t) => ({ ...t, wantsSupport: false, supportAreas: [], supportOtherDetail: "" }))
+                }
+              >
+                <span className="radio-dot" />
+                <span className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                  {c.tr_support_no}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {training.wantsSupport === true && (
+            <div className="card p-5 sm:p-6 mb-4">
+              <LabelBlock text={c.tr_support_areas_question} />
+              <Chips
+                value={training.supportAreas}
+                onChange={(v) => setTraining((t) => ({ ...t, supportAreas: v }))}
+                options={c.tr_support_areas_opts}
+              />
+              {training.supportAreas.includes(trainingOtherLabel) && (
+                <input
+                  className="input mt-3"
+                  type="text"
+                  placeholder={c.tr_support_other_ph}
+                  value={training.supportOtherDetail}
+                  onChange={(e) => setTraining((t) => ({ ...t, supportOtherDetail: e.target.value }))}
+                />
+              )}
+            </div>
+          )}
+
+          <div className="card p-5 sm:p-6">
+            <LabelBlock text={c.tr_pain_point} optionalLabel={c.optional} />
+            <textarea
+              className="textarea mt-3"
+              rows={3}
+              placeholder={c.tr_pain_point_ph}
+              value={training.painPoint}
+              onChange={(e) => setTraining((t) => ({ ...t, painPoint: e.target.value }))}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-3 mt-6">
+            <button className="btn-ghost text-sm" onClick={() => goto("landing")}>
+              ← {c.back}
+            </button>
+            <button
+              className="btn-primary px-6 py-3 rounded-xl text-base"
+              disabled={!trainingValid || submitting}
+              onClick={submitTraining}
+            >
+              {submitting ? c.submitting : `${c.submit} 🎓`}
+            </button>
+          </div>
+          {error && (
+            <div className="text-xs mt-2 text-right" style={{ color: "var(--brand)" }}>
+              {error}
+            </div>
+          )}
+        </section>
+      </Shell>
+    );
+  }
+
   // ---------- Thanks ----------
   const isBug = thanksKind === "bug";
+  const thanksTitle =
+    thanksKind === "bug" ? c.thanksTitleBug : thanksKind === "training" ? c.thanksTitleTraining : c.thanksTitleFb;
+  const thanksSub =
+    thanksKind === "bug" ? c.thanksSubBug : thanksKind === "training" ? c.thanksSubTraining : c.thanksSubFb;
   return (
     <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
       <section className="step-enter text-center">
         <div className="card p-8 sm:p-12">
-          {!isBug && <div className="text-6xl mb-4">🌟</div>}
+          {!isBug && <div className="text-6xl mb-4">{thanksKind === "training" ? "🎓" : "🌟"}</div>}
           <h1 className="text-2xl sm:text-3xl font-extrabold mb-3" style={{ color: "var(--ink)" }}>
-            {isBug ? c.thanksTitleBug : c.thanksTitleFb}
+            {thanksTitle}
           </h1>
           <p
             className="text-base sm:text-lg leading-relaxed mb-6"
             style={{ color: "var(--ink-2)", whiteSpace: "pre-line" }}
           >
-            {isBug ? c.thanksSubBug : c.thanksSubFb}
+            {thanksSub}
           </p>
           <button className="btn-primary px-6 py-3 rounded-xl text-base" onClick={reset}>
             {c.thanksBack}
