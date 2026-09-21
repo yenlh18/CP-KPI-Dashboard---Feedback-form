@@ -11,7 +11,7 @@ async function getData() {
   const sql = getSql();
   const feedback = (await sql`
     select id, created_at, lang, domain, overall, overall_feedback,
-           ease_submit, clarity_kpi, clarity_score, change_flow, change_note
+           start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note
     from feedback_responses order by created_at desc limit 100
   `) as unknown as FeedbackRow[];
   const bugs = (await sql`
@@ -81,10 +81,12 @@ export default async function AdminPage() {
                 <th className="px-3 py-2">Date</th>
                 <th className="px-3 py-2 min-w-[140px]">{q.q_dept}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_overall}</th>
-                <th className="px-3 py-2 min-w-[220px]">{q.q_ease_submit}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_start_clarity}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_kpi}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_score}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_change_flow}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_support_clarity}</th>
+                <th className="px-3 py-2 min-w-[220px]">{q.q_time_saved}</th>
                 <th className="px-3 py-2 min-w-[360px]">{q.q_overall_feedback}</th>
                 <th className="px-3 py-2 min-w-[360px]">{q.q_change_note}</th>
               </tr>
@@ -98,7 +100,7 @@ export default async function AdminPage() {
                     <Score v={r.overall} />
                   </td>
                   <td className="px-3 py-2">
-                    <Score v={r.ease_submit} />
+                    <Score v={r.start_clarity} />
                   </td>
                   <td className="px-3 py-2">
                     <Score v={r.clarity_kpi} />
@@ -108,6 +110,12 @@ export default async function AdminPage() {
                   </td>
                   <td className="px-3 py-2">
                     <Score v={r.change_flow} />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Score v={r.support_clarity} />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Score v={r.time_saved} />
                   </td>
                   <td className="max-w-md px-3 py-2 text-neutral-600">
                     {r.overall_feedback || <span className="text-neutral-400">—</span>}
@@ -119,7 +127,7 @@ export default async function AdminPage() {
               ))}
               {feedback.length === 0 && !dbError && (
                 <tr>
-                  <td colSpan={9} className="px-3 py-6 text-center text-neutral-400">
+                  <td colSpan={11} className="px-3 py-6 text-center text-neutral-400">
                     No feedback yet.
                   </td>
                 </tr>

@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     const rows = (await sql`
       select id, created_at, lang, domain, overall, overall_feedback,
-             ease_submit, clarity_kpi, clarity_score, change_flow, change_note
+             start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note
       from feedback_responses order by created_at desc
     `) as unknown as FeedbackRow[];
     const csv = toCsv(withGmt7Dates(rows));

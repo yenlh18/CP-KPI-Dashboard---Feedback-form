@@ -23,10 +23,11 @@ export async function POST(req: NextRequest) {
     const sql = getSql();
     await sql`
       insert into feedback_responses
-        (lang, domain, overall, overall_feedback, ease_submit, clarity_kpi, clarity_score, change_flow, change_note, user_agent)
+        (lang, domain, overall, overall_feedback, start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note, user_agent)
       values
         (${p.lang}, ${p.domain}, ${p.overall}, ${p.overallFeedback || null},
-         ${p.easeSubmit ?? null}, ${p.clarityKpi ?? null}, ${p.clarityScore ?? null}, ${p.changeFlow ?? null},
+         ${p.startClarity ?? null}, ${p.clarityKpi ?? null}, ${p.clarityScore ?? null}, ${p.changeFlow ?? null},
+         ${p.supportClarity ?? null}, ${p.timeSaved ?? null},
          ${p.changeNote || null}, ${req.headers.get("user-agent") || null})
     `;
     return NextResponse.json({ ok: true }, { status: 201 });

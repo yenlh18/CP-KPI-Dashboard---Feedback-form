@@ -10,13 +10,22 @@ create table if not exists feedback_responses (
   domain             text not null,
   overall            smallint not null check (overall between 1 and 5),
   overall_feedback   text,
-  ease_submit        smallint check (ease_submit between 1 and 5),
+  start_clarity      smallint check (start_clarity between 1 and 5),
   clarity_kpi        smallint check (clarity_kpi between 1 and 5),
   clarity_score      smallint check (clarity_score between 1 and 5),
   change_flow        smallint check (change_flow between 1 and 5),
+  support_clarity    smallint check (support_clarity between 1 and 5),
+  time_saved         smallint check (time_saved between 1 and 5),
   change_note        text,
   user_agent         text
 );
+
+-- feedback form restructure: add the new tab-B questions, drop the retired
+-- "Submit Results" ease question (ease_submit)
+alter table feedback_responses add column if not exists start_clarity smallint check (start_clarity between 1 and 5);
+alter table feedback_responses add column if not exists support_clarity smallint check (support_clarity between 1 and 5);
+alter table feedback_responses add column if not exists time_saved smallint check (time_saved between 1 and 5);
+alter table feedback_responses drop column if exists ease_submit;
 
 create table if not exists bug_reports (
   id                 uuid primary key default gen_random_uuid(),

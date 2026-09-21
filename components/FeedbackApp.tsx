@@ -21,10 +21,12 @@ interface FeedbackFormState {
   dept: string;
   overall: number | null;
   overallFeedback: string;
-  easeSubmit: number | null;
+  startClarity: number | null;
   clarityKpi: number | null;
   clarityScore: number | null;
   changeFlow: number | null;
+  supportClarity: number | null;
+  timeSaved: number | null;
   changeNote: string;
 }
 
@@ -42,10 +44,12 @@ const emptyFeedback: FeedbackFormState = {
   dept: "",
   overall: null,
   overallFeedback: "",
-  easeSubmit: null,
+  startClarity: null,
   clarityKpi: null,
   clarityScore: null,
   changeFlow: null,
+  supportClarity: null,
+  timeSaved: null,
   changeNote: "",
 };
 
@@ -264,10 +268,12 @@ export default function FeedbackApp() {
           domain: feedback.dept,
           overall: feedback.overall,
           overallFeedback: feedback.overallFeedback,
-          easeSubmit: feedback.easeSubmit,
+          startClarity: feedback.startClarity,
           clarityKpi: feedback.clarityKpi,
           clarityScore: feedback.clarityScore,
           changeFlow: feedback.changeFlow,
+          supportClarity: feedback.supportClarity,
+          timeSaved: feedback.timeSaved,
           changeNote: feedback.changeNote,
         }),
       });
@@ -435,7 +441,7 @@ export default function FeedbackApp() {
             <div className="flex items-center justify-between text-xs mb-2" style={{ color: "var(--ink-3)" }}>
               <span className="section-tag">
                 <span className="dot" />
-                {c.stepOf(step + 1, FEEDBACK_STEPS)}
+                {step === 0 ? "A" : "B"}
               </span>
               <span>{pct}%</span>
             </div>
@@ -448,10 +454,10 @@ export default function FeedbackApp() {
             <>
               <div className="mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: "var(--ink)" }}>
-                  {c.step1Title}
+                  {c.tabALabel}
                 </h2>
                 <p className="text-sm sm:text-base" style={{ color: "var(--ink-2)" }}>
-                  {c.step1Sub}
+                  {c.tabASub}
                 </p>
               </div>
               <div className="card p-5 sm:p-6 mb-4">
@@ -469,7 +475,7 @@ export default function FeedbackApp() {
                 <EmojiScale
                   value={feedback.overall}
                   onChange={(v) => setFeedback((f) => ({ ...f, overall: v }))}
-                  options={c.scaleUseful}
+                  options={c.scaleEase}
                 />
               </div>
               <div className="card p-5 sm:p-6">
@@ -489,22 +495,19 @@ export default function FeedbackApp() {
             <>
               <div className="mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: "var(--ink)" }}>
-                  {c.step2Title}
+                  {c.tabBLabel}
                 </h2>
                 <p className="text-sm sm:text-base" style={{ color: "var(--ink-2)" }}>
-                  {c.step2Sub}
+                  {c.tabBSub}
                 </p>
               </div>
 
-              <div className="section-tag mb-3" style={{ fontWeight: 700, color: "var(--brand)" }}>
-                {c.section1Title}
-              </div>
               <div className="card p-5 sm:p-6 mb-4">
-                <LabelBlock text={c.q_ease_submit} optionalLabel={c.optional} />
+                <LabelBlock text={c.q_start_clarity} optionalLabel={c.optional} />
                 <EmojiScale
-                  value={feedback.easeSubmit}
-                  onChange={(v) => setFeedback((f) => ({ ...f, easeSubmit: v }))}
-                  options={c.scaleEase}
+                  value={feedback.startClarity}
+                  onChange={(v) => setFeedback((f) => ({ ...f, startClarity: v }))}
+                  options={c.scaleStartClarity}
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
@@ -513,7 +516,7 @@ export default function FeedbackApp() {
                 <EmojiScale
                   value={feedback.clarityKpi}
                   onChange={(v) => setFeedback((f) => ({ ...f, clarityKpi: v }))}
-                  options={c.scaleClarity}
+                  options={c.scaleEase}
                 />
                 <div className="divider mt-5" />
                 <div className="mt-5">
@@ -524,19 +527,35 @@ export default function FeedbackApp() {
                   onChange={(v) => setFeedback((f) => ({ ...f, clarityScore: v }))}
                   options={c.scaleClarity}
                 />
-              </div>
-
-              <div className="section-tag mb-3 mt-6" style={{ fontWeight: 700, color: "var(--brand)" }}>
-                {c.section2Title}
-              </div>
-              <div className="card p-5 sm:p-6 mb-4">
-                <LabelBlock text={c.q_change_flow} optionalLabel={c.optional} />
+                <div className="divider mt-5" />
+                <div className="mt-5">
+                  <LabelBlock text={c.q_change_flow} optionalLabel={c.optional} />
+                </div>
                 <EmojiScale
                   value={feedback.changeFlow}
                   onChange={(v) => setFeedback((f) => ({ ...f, changeFlow: v }))}
-                  options={c.scaleClarity}
+                  options={c.scaleEase}
+                />
+                <div className="divider mt-5" />
+                <div className="mt-5">
+                  <LabelBlock text={c.q_support_clarity} optionalLabel={c.optional} />
+                </div>
+                <EmojiScale
+                  value={feedback.supportClarity}
+                  onChange={(v) => setFeedback((f) => ({ ...f, supportClarity: v }))}
+                  options={c.scaleEase}
+                />
+                <div className="divider mt-5" />
+                <div className="mt-5">
+                  <LabelBlock text={c.q_time_saved} optionalLabel={c.optional} />
+                </div>
+                <EmojiScale
+                  value={feedback.timeSaved}
+                  onChange={(v) => setFeedback((f) => ({ ...f, timeSaved: v }))}
+                  options={c.scaleHelpful}
                 />
               </div>
+
               <div className="card p-5 sm:p-6">
                 <LabelBlock text={c.q_change_note} optionalLabel={c.optional} />
                 <textarea

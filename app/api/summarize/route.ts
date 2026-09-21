@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     } else {
       const rows = (await sql`
         select created_at, lang, domain, overall, overall_feedback,
-               ease_submit, clarity_kpi, clarity_score, change_flow, change_note
+               start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note
         from feedback_responses order by created_at desc limit 200
       `) as unknown as FeedbackRow[];
       if (rows.length === 0) {
@@ -48,10 +48,12 @@ export async function POST(req: NextRequest) {
         .map((r, i) => {
           const scores = [
             `overall=${r.overall}`,
-            r.ease_submit != null ? `ease_submit=${r.ease_submit}` : null,
+            r.start_clarity != null ? `start_clarity=${r.start_clarity}` : null,
             r.clarity_kpi != null ? `clarity_kpi=${r.clarity_kpi}` : null,
             r.clarity_score != null ? `clarity_score=${r.clarity_score}` : null,
             r.change_flow != null ? `change_flow=${r.change_flow}` : null,
+            r.support_clarity != null ? `support_clarity=${r.support_clarity}` : null,
+            r.time_saved != null ? `time_saved=${r.time_saved}` : null,
           ]
             .filter(Boolean)
             .join(", ");

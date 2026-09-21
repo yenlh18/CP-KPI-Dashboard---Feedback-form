@@ -7,10 +7,12 @@ export const feedbackPayloadSchema = z.object({
   domain: z.string().trim().min(1).max(200),
   overall: scoreSchema,
   overallFeedback: z.string().trim().max(4000).optional().default(""),
-  easeSubmit: scoreSchema.optional().nullable(),
+  startClarity: scoreSchema.optional().nullable(),
   clarityKpi: scoreSchema.optional().nullable(),
   clarityScore: scoreSchema.optional().nullable(),
   changeFlow: scoreSchema.optional().nullable(),
+  supportClarity: scoreSchema.optional().nullable(),
+  timeSaved: scoreSchema.optional().nullable(),
   changeNote: z.string().trim().max(4000).optional().default(""),
 });
 export type FeedbackPayload = z.infer<typeof feedbackPayloadSchema>;
@@ -45,10 +47,12 @@ export interface FeedbackRow {
   domain: string;
   overall: number;
   overall_feedback: string | null;
-  ease_submit: number | null;
+  start_clarity: number | null;
   clarity_kpi: number | null;
   clarity_score: number | null;
   change_flow: number | null;
+  support_clarity: number | null;
+  time_saved: number | null;
   change_note: string | null;
 }
 
