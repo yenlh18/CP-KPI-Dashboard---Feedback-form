@@ -104,8 +104,8 @@ export const copy = {
       { v: 1, e: "😣", label: "Không giúp ích gì" },
       { v: 2, e: "🙁", label: "Ít giúp ích" },
       { v: 3, e: "😐", label: "Bình thường" },
-      { v: 4, e: "🙂", label: "Giúp ích nhiều" },
-      { v: 5, e: "😄", label: "Giúp ích rất nhiều" },
+      { v: 4, e: "🙂", label: "Có giúp ích" },
+      { v: 5, e: "😄", label: "Giúp ích nhiều" },
     ],
   },
   en: {
