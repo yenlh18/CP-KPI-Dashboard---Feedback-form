@@ -25,11 +25,15 @@ create table if not exists bug_reports (
   issue              text not null,
   where_tags         text[] not null default '{}',
   domain             text,
-  screenshot_url     text,
+  screenshot_urls    text[] not null default '{}',
   user_agent         text
 );
 
-alter table bug_reports add column if not exists screenshot_url text;
+-- migrate from the earlier single screenshot_url column to screenshot_urls;
+-- reads via to_jsonb so this is a no-op (not an error) once the column is gone
+alter table bug_reports add column if not exists screenshot_urls text[] not null default '{}';
+update bug_reports set screenshot_urls = array[to_jsonb(bug_reports) ->> 'screenshot_url'] where (to_jsonb(bug_reports) ->> 'screenshot_url') is not null and coalesce(array_length(screenshot_urls, 1), 0) = 0;
+alter table bug_reports drop column if exists screenshot_url;
 
 create index if not exists feedback_responses_created_at_idx on feedback_responses (created_at desc);
 create index if not exists bug_reports_created_at_idx on bug_reports (created_at desc);

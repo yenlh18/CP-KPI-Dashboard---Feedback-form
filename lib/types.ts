@@ -20,16 +20,20 @@ export const bugPayloadSchema = z.object({
   issue: z.string().trim().min(1).max(4000),
   whereTags: z.array(z.string()).max(20).optional().default([]),
   domain: z.string().trim().max(200).optional().default(""),
-  screenshotUrl: z
-    .string()
-    .trim()
-    .url()
-    .max(2000)
-    .refine((url) => new URL(url).hostname.endsWith(".public.blob.vercel-storage.com"), {
-      message: "screenshotUrl must be a Vercel Blob URL",
-    })
+  screenshotUrls: z
+    .array(
+      z
+        .string()
+        .trim()
+        .url()
+        .max(2000)
+        .refine((url) => new URL(url).hostname.endsWith(".public.blob.vercel-storage.com"), {
+          message: "screenshotUrls entries must be Vercel Blob URLs",
+        })
+    )
+    .max(5)
     .optional()
-    .nullable(),
+    .default([]),
 });
 export type BugPayload = z.infer<typeof bugPayloadSchema>;
 
@@ -55,5 +59,5 @@ export interface BugRow {
   issue: string;
   where_tags: string[];
   domain: string | null;
-  screenshot_url: string | null;
+  screenshot_urls: string[];
 }

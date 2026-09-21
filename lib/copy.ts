@@ -76,6 +76,8 @@ export const copy = {
     bug_screenshot_remove: "Xóa ảnh",
     bug_screenshot_toolarge: "Ảnh vượt quá 10MB.",
     bug_screenshot_badtype: "Chỉ nhận file PNG hoặc JPG.",
+    bug_screenshot_hint: (n: number) => `PNG / JPG · ≤10MB mỗi ảnh · Tối đa ${n} ảnh`,
+    bug_screenshot_limit: (n: number) => `Anh/Chị chỉ có thể đính kèm tối đa ${n} ảnh.`,
     bug_domain: "Domain của Anh/Chị để team hỗ trợ thêm",
     bug_domain_ph: "Ví dụ: HR, S&I, DTO…",
 
@@ -176,6 +178,8 @@ export const copy = {
     bug_screenshot_remove: "Remove",
     bug_screenshot_toolarge: "Image is larger than 10MB.",
     bug_screenshot_badtype: "Only PNG or JPG files are accepted.",
+    bug_screenshot_hint: (n: number) => `PNG / JPG · ≤10MB each · Up to ${n} images`,
+    bug_screenshot_limit: (n: number) => `You can attach up to ${n} images.`,
     bug_domain: "Your domain so the team can follow up",
     bug_domain_ph: "E.g. HR, S&I, DTO…",
 

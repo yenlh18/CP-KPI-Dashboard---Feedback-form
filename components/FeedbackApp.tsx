@@ -6,7 +6,13 @@ import { upload } from "@vercel/blob/client";
 import { copy, type Lang } from "@/lib/copy";
 
 const MAX_SCREENSHOT_BYTES = 10 * 1024 * 1024;
+const MAX_SCREENSHOTS = 5;
 const ALLOWED_SCREENSHOT_TYPES = ["image/png", "image/jpeg"];
+
+interface Screenshot {
+  url: string;
+  name: string;
+}
 
 type View = "landing" | "feedback" | "bug" | "thanks";
 type ThanksKind = "feedback" | "bug";
@@ -26,8 +32,7 @@ interface BugFormState {
   issue: string;
   whereTags: string[];
   domain: string;
-  screenshotUrl: string | null;
-  screenshotName: string | null;
+  screenshots: Screenshot[];
 }
 
 const FEEDBACK_STEPS = 2;
@@ -48,8 +53,7 @@ const emptyBug: BugFormState = {
   issue: "",
   whereTags: [],
   domain: "",
-  screenshotUrl: null,
-  screenshotName: null,
+  screenshots: [],
 };
 
 function fireConfetti(subtle = false) {
@@ -291,7 +295,7 @@ export default function FeedbackApp() {
           issue: bug.issue,
           whereTags: bug.whereTags,
           domain: bug.domain,
-          screenshotUrl: bug.screenshotUrl,
+          screenshotUrls: bug.screenshots.map((s) => s.url),
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -306,38 +310,50 @@ export default function FeedbackApp() {
   }
 
   async function handleScreenshotSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const files = Array.from(e.target.files ?? []);
     e.target.value = "";
-    if (!file) return;
+    if (files.length === 0) return;
 
     setScreenshotError(null);
 
-    if (!ALLOWED_SCREENSHOT_TYPES.includes(file.type)) {
-      setScreenshotError(c.bug_screenshot_badtype);
-      return;
-    }
-    if (file.size > MAX_SCREENSHOT_BYTES) {
-      setScreenshotError(c.bug_screenshot_toolarge);
+    const remainingSlots = MAX_SCREENSHOTS - bug.screenshots.length;
+    if (remainingSlots <= 0) {
+      setScreenshotError(c.bug_screenshot_limit(MAX_SCREENSHOTS));
       return;
     }
 
     setScreenshotUploading(true);
     try {
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-      });
-      setBug((b) => ({ ...b, screenshotUrl: blob.url, screenshotName: file.name }));
-    } catch (err) {
-      console.error(err);
-      setScreenshotError(c.bug_screenshot_error);
+      for (const file of files.slice(0, remainingSlots)) {
+        if (!ALLOWED_SCREENSHOT_TYPES.includes(file.type)) {
+          setScreenshotError(c.bug_screenshot_badtype);
+          continue;
+        }
+        if (file.size > MAX_SCREENSHOT_BYTES) {
+          setScreenshotError(c.bug_screenshot_toolarge);
+          continue;
+        }
+        try {
+          const blob = await upload(file.name, file, {
+            access: "public",
+            handleUploadUrl: "/api/upload",
+          });
+          setBug((b) => ({ ...b, screenshots: [...b.screenshots, { url: blob.url, name: file.name }] }));
+        } catch (err) {
+          console.error(err);
+          setScreenshotError(c.bug_screenshot_error);
+        }
+      }
+      if (files.length > remainingSlots) {
+        setScreenshotError(c.bug_screenshot_limit(MAX_SCREENSHOTS));
+      }
     } finally {
       setScreenshotUploading(false);
     }
   }
 
-  function removeScreenshot() {
-    setBug((b) => ({ ...b, screenshotUrl: null, screenshotName: null }));
+  function removeScreenshot(index: number) {
+    setBug((b) => ({ ...b, screenshots: b.screenshots.filter((_, i) => i !== index) }));
     setScreenshotError(null);
   }
 
@@ -605,34 +621,44 @@ export default function FeedbackApp() {
               ref={fileInputRef}
               type="file"
               accept="image/png,image/jpeg"
+              multiple
               className="hidden"
               onChange={handleScreenshotSelect}
             />
-            {bug.screenshotUrl ? (
-              <div className="mt-3 flex items-center gap-3 rounded-2xl border p-3" style={{ borderColor: "var(--line-2)", background: "var(--card-2)" }}>
-                <img
-                  src={bug.screenshotUrl}
-                  alt={bug.screenshotName ?? "screenshot"}
-                  className="h-14 w-14 rounded-lg object-cover"
-                />
-                <div className="min-w-0 flex-1 text-sm truncate" style={{ color: "var(--ink-2)" }}>
-                  {bug.screenshotName}
+            <div className="mt-3 flex flex-wrap gap-3">
+              {bug.screenshots.map((s, idx) => (
+                <div key={s.url} className="relative">
+                  <img
+                    src={s.url}
+                    alt={s.name}
+                    className="h-16 w-16 rounded-lg object-cover border"
+                    style={{ borderColor: "var(--line-2)" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeScreenshot(idx)}
+                    aria-label={c.bug_screenshot_remove}
+                    className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
+                    style={{ background: "var(--brand)", color: "#fff" }}
+                  >
+                    ×
+                  </button>
                 </div>
-                <button type="button" className="btn-ghost text-sm shrink-0" onClick={removeScreenshot}>
-                  {c.bug_screenshot_remove}
-                </button>
-              </div>
-            ) : (
-              <div
-                className="file-drop mt-3"
-                role="button"
-                tabIndex={0}
-                onClick={() => !screenshotUploading && fileInputRef.current?.click()}
-              >
-                <div className="text-2xl mb-1">{screenshotUploading ? "⏳" : "📎"}</div>
-                <div className="text-sm">{screenshotUploading ? c.bug_screenshot_uploading : "PNG / JPG · ≤10MB"}</div>
-              </div>
-            )}
+              ))}
+              {bug.screenshots.length < MAX_SCREENSHOTS && (
+                <div
+                  className="file-drop-tile"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => !screenshotUploading && fileInputRef.current?.click()}
+                >
+                  <span className="text-xl">{screenshotUploading ? "⏳" : "+"}</span>
+                </div>
+              )}
+            </div>
+            <div className="text-xs mt-2" style={{ color: "var(--ink-3)" }}>
+              {screenshotUploading ? c.bug_screenshot_uploading : c.bug_screenshot_hint(MAX_SCREENSHOTS)}
+            </div>
             {screenshotError && (
               <div className="text-xs mt-2" style={{ color: "var(--brand)" }}>
                 {screenshotError}

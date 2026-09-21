@@ -321,6 +321,23 @@ body {
   background: var(--card-2);
 }
 
+.file-drop-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 2px dashed var(--line-2);
+  border-radius: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.file-drop-tile:hover {
+  border-color: var(--brand);
+  background: var(--card-2);
+}
+
 .step-enter {
   animation: stepIn 0.25s ease both;
 }

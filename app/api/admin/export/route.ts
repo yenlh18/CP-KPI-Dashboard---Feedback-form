@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const sql = getSql();
     if (kind === "bug") {
       const rows = (await sql`
-        select id, created_at, lang, issue, where_tags, domain, screenshot_url
+        select id, created_at, lang, issue, where_tags, domain, screenshot_urls
         from bug_reports order by created_at desc
       `) as unknown as BugRow[];
       const csv = toCsv(withGmt7Dates(rows));

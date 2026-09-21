@@ -15,7 +15,7 @@ async function getData() {
     from feedback_responses order by created_at desc limit 100
   `) as unknown as FeedbackRow[];
   const bugs = (await sql`
-    select id, created_at, lang, issue, where_tags, domain, screenshot_url
+    select id, created_at, lang, issue, where_tags, domain, screenshot_urls
     from bug_reports order by created_at desc limit 100
   `) as unknown as BugRow[];
   return { feedback, bugs };
@@ -161,14 +161,18 @@ export default async function AdminPage() {
                   <td className="px-3 py-2 text-neutral-600">{b.where_tags?.join(", ") || "—"}</td>
                   <td className="max-w-md px-3 py-2 text-neutral-600">{b.issue}</td>
                   <td className="px-3 py-2">
-                    {b.screenshot_url ? (
-                      <a href={b.screenshot_url} target="_blank" rel="noopener noreferrer">
-                        <img
-                          src={b.screenshot_url}
-                          alt="screenshot"
-                          className="h-12 w-12 rounded-md object-cover border border-neutral-200"
-                        />
-                      </a>
+                    {b.screenshot_urls?.length ? (
+                      <div className="flex flex-wrap gap-1">
+                        {b.screenshot_urls.map((url) => (
+                          <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={url}
+                              alt="screenshot"
+                              className="h-12 w-12 rounded-md object-cover border border-neutral-200"
+                            />
+                          </a>
+                        ))}
+                      </div>
                     ) : (
                       <span className="text-neutral-400">—</span>
                     )}
