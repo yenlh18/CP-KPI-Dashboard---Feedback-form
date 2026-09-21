@@ -15,7 +15,7 @@ async function getData() {
     from feedback_responses order by created_at desc limit 100
   `) as unknown as FeedbackRow[];
   const bugs = (await sql`
-    select id, created_at, lang, issue, where_tags, domain
+    select id, created_at, lang, issue, where_tags, domain, screenshot_url
     from bug_reports order by created_at desc limit 100
   `) as unknown as BugRow[];
   return { feedback, bugs };
@@ -150,6 +150,7 @@ export default async function AdminPage() {
                 <th className="px-3 py-2 min-w-[140px]">{q.bug_domain}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.bug_where}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.bug_issue}</th>
+                <th className="px-3 py-2">{q.bug_screenshot}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
@@ -159,11 +160,24 @@ export default async function AdminPage() {
                   <td className="px-3 py-2 font-medium text-neutral-900">{b.domain || "—"}</td>
                   <td className="px-3 py-2 text-neutral-600">{b.where_tags?.join(", ") || "—"}</td>
                   <td className="max-w-md px-3 py-2 text-neutral-600">{b.issue}</td>
+                  <td className="px-3 py-2">
+                    {b.screenshot_url ? (
+                      <a href={b.screenshot_url} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={b.screenshot_url}
+                          alt="screenshot"
+                          className="h-12 w-12 rounded-md object-cover border border-neutral-200"
+                        />
+                      </a>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {bugs.length === 0 && !dbError && (
                 <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center text-neutral-400">
+                  <td colSpan={5} className="px-3 py-6 text-center text-neutral-400">
                     No bug reports yet.
                   </td>
                 </tr>

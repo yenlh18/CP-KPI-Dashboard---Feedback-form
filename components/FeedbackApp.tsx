@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { upload } from "@vercel/blob/client";
 import { copy, type Lang } from "@/lib/copy";
+
+const MAX_SCREENSHOT_BYTES = 10 * 1024 * 1024;
+const ALLOWED_SCREENSHOT_TYPES = ["image/png", "image/jpeg"];
 
 type View = "landing" | "feedback" | "bug" | "thanks";
 type ThanksKind = "feedback" | "bug";
@@ -22,6 +26,8 @@ interface BugFormState {
   issue: string;
   whereTags: string[];
   domain: string;
+  screenshotUrl: string | null;
+  screenshotName: string | null;
 }
 
 const FEEDBACK_STEPS = 2;
@@ -38,7 +44,13 @@ const emptyFeedback: FeedbackFormState = {
   changeNote: "",
 };
 
-const emptyBug: BugFormState = { issue: "", whereTags: [], domain: "" };
+const emptyBug: BugFormState = {
+  issue: "",
+  whereTags: [],
+  domain: "",
+  screenshotUrl: null,
+  screenshotName: null,
+};
 
 function fireConfetti(subtle = false) {
   if (typeof document === "undefined") return;
@@ -195,6 +207,9 @@ export default function FeedbackApp() {
   const [bug, setBug] = useState<BugFormState>(emptyBug);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [screenshotUploading, setScreenshotUploading] = useState(false);
+  const [screenshotError, setScreenshotError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const c = copy[lang];
 
@@ -224,6 +239,8 @@ export default function FeedbackApp() {
     setBug(emptyBug);
     setStep(0);
     setError(null);
+    setScreenshotError(null);
+    setScreenshotUploading(false);
     goto("landing");
   }
 
@@ -274,6 +291,7 @@ export default function FeedbackApp() {
           issue: bug.issue,
           whereTags: bug.whereTags,
           domain: bug.domain,
+          screenshotUrl: bug.screenshotUrl,
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -285,6 +303,42 @@ export default function FeedbackApp() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function handleScreenshotSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setScreenshotError(null);
+
+    if (!ALLOWED_SCREENSHOT_TYPES.includes(file.type)) {
+      setScreenshotError(c.bug_screenshot_badtype);
+      return;
+    }
+    if (file.size > MAX_SCREENSHOT_BYTES) {
+      setScreenshotError(c.bug_screenshot_toolarge);
+      return;
+    }
+
+    setScreenshotUploading(true);
+    try {
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+      });
+      setBug((b) => ({ ...b, screenshotUrl: blob.url, screenshotName: file.name }));
+    } catch (err) {
+      console.error(err);
+      setScreenshotError(c.bug_screenshot_error);
+    } finally {
+      setScreenshotUploading(false);
+    }
+  }
+
+  function removeScreenshot() {
+    setBug((b) => ({ ...b, screenshotUrl: null, screenshotName: null }));
+    setScreenshotError(null);
   }
 
   // ---------- Landing ----------
@@ -546,14 +600,44 @@ export default function FeedbackApp() {
           </div>
 
           <div className="card p-5 sm:p-6 mb-4">
-            <LabelBlock text={c.bug_screenshot} />
-            <div
-              className="file-drop mt-3"
-              onClick={() => alert(lang === "vi" ? "Chưa hỗ trợ upload trong bản demo này" : "Upload isn't wired up in this demo")}
-            >
-              <div className="text-2xl mb-1">📎</div>
-              <div className="text-sm">PNG / JPG · ≤10MB</div>
-            </div>
+            <LabelBlock text={c.bug_screenshot} optionalLabel={c.bug_screenshot_optional} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg"
+              className="hidden"
+              onChange={handleScreenshotSelect}
+            />
+            {bug.screenshotUrl ? (
+              <div className="mt-3 flex items-center gap-3 rounded-2xl border p-3" style={{ borderColor: "var(--line-2)", background: "var(--card-2)" }}>
+                <img
+                  src={bug.screenshotUrl}
+                  alt={bug.screenshotName ?? "screenshot"}
+                  className="h-14 w-14 rounded-lg object-cover"
+                />
+                <div className="min-w-0 flex-1 text-sm truncate" style={{ color: "var(--ink-2)" }}>
+                  {bug.screenshotName}
+                </div>
+                <button type="button" className="btn-ghost text-sm shrink-0" onClick={removeScreenshot}>
+                  {c.bug_screenshot_remove}
+                </button>
+              </div>
+            ) : (
+              <div
+                className="file-drop mt-3"
+                role="button"
+                tabIndex={0}
+                onClick={() => !screenshotUploading && fileInputRef.current?.click()}
+              >
+                <div className="text-2xl mb-1">{screenshotUploading ? "⏳" : "📎"}</div>
+                <div className="text-sm">{screenshotUploading ? c.bug_screenshot_uploading : "PNG / JPG · ≤10MB"}</div>
+              </div>
+            )}
+            {screenshotError && (
+              <div className="text-xs mt-2" style={{ color: "var(--brand)" }}>
+                {screenshotError}
+              </div>
+            )}
           </div>
 
           <div className="card p-5 sm:p-6 mb-4">
@@ -571,7 +655,7 @@ export default function FeedbackApp() {
             <button className="btn-ghost text-sm" onClick={() => goto("landing")}>
               ← {c.back}
             </button>
-            <button className="btn-primary px-6 py-3 rounded-xl text-base" disabled={!bugValid || submitting} onClick={submitBug}>
+            <button className="btn-primary px-6 py-3 rounded-xl text-base" disabled={!bugValid || submitting || screenshotUploading} onClick={submitBug}>
               {submitting ? c.submitting : `${c.submitBug} 🚀`}
             </button>
           </div>

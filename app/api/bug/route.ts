@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
     const sql = getSql();
     await sql`
       insert into bug_reports
-        (lang, issue, where_tags, domain, user_agent)
+        (lang, issue, where_tags, domain, screenshot_url, user_agent)
       values
-        (${p.lang}, ${p.issue}, ${p.whereTags}, ${p.domain || null}, ${req.headers.get("user-agent") || null})
+        (${p.lang}, ${p.issue}, ${p.whereTags}, ${p.domain || null}, ${p.screenshotUrl || null}, ${req.headers.get("user-agent") || null})
     `;
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {
