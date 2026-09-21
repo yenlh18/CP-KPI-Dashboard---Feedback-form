@@ -928,7 +928,7 @@ export default function FeedbackApp() {
           )}
 
           <div className="card p-5 sm:p-6">
-            <LabelBlock text={c.tr_pain_point} optionalLabel={c.optional} />
+            <LabelBlock text={c.tr_pain_point} />
             <textarea
               className="textarea mt-3"
               rows={3}
