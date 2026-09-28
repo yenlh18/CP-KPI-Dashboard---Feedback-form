@@ -2,6 +2,7 @@ import { getSql } from "@/lib/db";
 import type { BugRow, FeedbackRow, TrainingFeedbackRow } from "@/lib/types";
 import AdminSummarize from "@/components/AdminSummarize";
 import { copy } from "@/lib/copy";
+import { auth } from "@/auth";
 
 const q = copy.vi;
 
@@ -59,9 +60,22 @@ export default async function AdminPage() {
     dbError = err instanceof Error ? err.message : "Failed to load data.";
   }
 
+  const session = await auth();
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-extrabold text-neutral-900">CP KPI Dashboard — Admin</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-extrabold text-neutral-900">CP KPI Dashboard — Admin</h1>
+        {session?.user && (
+          <div className="text-sm text-neutral-500">
+            Signed in as <span className="font-medium text-neutral-700">{session.user.email ?? session.user.name}</span>{" "}
+            ·{" "}
+            <a href="/api/auth/signout?callbackUrl=/admin" className="text-[#F05A22] hover:underline">
+              Sign out
+            </a>
+          </div>
+        )}
+      </div>
       <p className="mt-1 text-sm text-neutral-500">
         {feedback.length} feedback response(s) · {bugs.length} bug report(s) · {training.length} training feedback
         response(s) shown (latest 100 each).

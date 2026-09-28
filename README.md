@@ -21,7 +21,7 @@ an admin view with CSV export and an optional AI summary.
 ```bash
 npm install
 cp .env.example .env.local
-# edit .env.local: set DATABASE_URL, ADMIN_PASSWORD, and (optionally) ANTHROPIC_API_KEY
+# edit .env.local: set DATABASE_URL, AUTH_SECRET, AUTH_MICROSOFT_ENTRA_ID_*, and (optionally) ANTHROPIC_API_KEY
 npm run db:init     # creates the feedback_responses / bug_reports tables
 npm run dev          # http://localhost:3000
 ```
@@ -66,7 +66,10 @@ works too — set `DATABASE_URL` manually in Project Settings.
 | Variable | Required | Notes |
 |---|---|---|
 | `DATABASE_URL` | Yes | Auto-set if you used the Vercel↔Neon integration above |
-| `ADMIN_PASSWORD` | Yes | Protects `/admin` via HTTP Basic Auth (any username works) |
+| `AUTH_SECRET` | Yes | Random string used to sign session cookies (see `.env.example`) |
+| `AUTH_MICROSOFT_ENTRA_ID_ID` | Yes | Client ID from your Entra ID App Registration — protects `/admin` via Microsoft/Office 365 SSO |
+| `AUTH_MICROSOFT_ENTRA_ID_SECRET` | Yes | Client secret value from the same App Registration |
+| `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | Yes | `https://login.microsoftonline.com/<tenant ID>/v2.0/` |
 | `ANTHROPIC_API_KEY` | No | Only needed for the "Summarize with AI" button on `/admin` |
 
 ### e) Initialize the database schema
@@ -99,7 +102,12 @@ server-side with `zod` (`lib/types.ts`).
 
 ## 5. Admin view (`/admin`)
 
-- Protected by HTTP Basic Auth (`middleware.ts`) using `ADMIN_PASSWORD`
+- Protected by Microsoft Entra ID (Office 365) SSO via [Auth.js](https://authjs.dev)
+  (`auth.ts`, `middleware.ts`) — any signed-in user from the configured tenant can
+  access it. Requesting a new App Registration? The redirect URI to give the
+  identity team is `https://<your-domain>/api/auth/callback/microsoft-entra-id`.
+  This is a pure sign-in flow (OIDC `openid profile email offline_access` scopes
+  only) — no Microsoft Graph API permission is requested.
 - Shows the latest 100 rows of each table
 - **Export CSV** — downloads all rows (not just the 100 shown) as CSV
 - **Summarize with AI** — sends the latest 200 rows to Claude
