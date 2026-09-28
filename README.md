@@ -70,6 +70,7 @@ works too — set `DATABASE_URL` manually in Project Settings.
 | `AUTH_MICROSOFT_ENTRA_ID_ID` | Yes | Client ID from your Entra ID App Registration — protects `/admin` via Microsoft/Office 365 SSO |
 | `AUTH_MICROSOFT_ENTRA_ID_SECRET` | Yes | Client secret value from the same App Registration |
 | `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | Yes | `https://login.microsoftonline.com/<tenant ID>/v2.0` (no trailing slash) |
+| `ADMIN_ALLOWED_EMAILS` | Yes | Comma-separated emails allowed to view `/admin` (any tenant account can sign in, but only these see the dashboard) |
 | `ANTHROPIC_API_KEY` | No | Only needed for the "Summarize with AI" button on `/admin` |
 
 ### e) Initialize the database schema
@@ -103,11 +104,15 @@ server-side with `zod` (`lib/types.ts`).
 ## 5. Admin view (`/admin`)
 
 - Protected by Microsoft Entra ID (Office 365) SSO via [Auth.js](https://authjs.dev)
-  (`auth.ts`, `middleware.ts`) — any signed-in user from the configured tenant can
-  access it. Requesting a new App Registration? The redirect URI to give the
-  identity team is `https://<your-domain>/api/auth/callback/microsoft-entra-id`.
-  This is a pure sign-in flow (OIDC `openid profile email offline_access` scopes
-  only) — no Microsoft Graph API permission is requested.
+  (`auth.ts`, `middleware.ts`) — anyone in the configured tenant can sign in, but
+  only emails listed in `ADMIN_ALLOWED_EMAILS` are authorized to view the
+  dashboard (others get a 403 after signing in). Requesting a new App
+  Registration? The redirect URI to give the identity team is
+  `https://<your-domain>/api/auth/callback/microsoft-entra-id`. This is a pure
+  sign-in flow (OIDC `openid profile email offline_access` scopes only) — no
+  Microsoft Graph API permission is requested. Note: your tenant may require an
+  admin to click **"Grant admin consent"** on the App Registration once before
+  non-admin users can sign in without an approval prompt.
 - Shows the latest 100 rows of each table
 - **Export CSV** — downloads all rows (not just the 100 shown) as CSV
 - **Summarize with AI** — sends the latest 200 rows to Claude
