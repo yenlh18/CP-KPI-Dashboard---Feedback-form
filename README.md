@@ -69,7 +69,7 @@ works too — set `DATABASE_URL` manually in Project Settings.
 | `AUTH_SECRET` | Yes | Random string used to sign session cookies (see `.env.example`) |
 | `AUTH_MICROSOFT_ENTRA_ID_ID` | Yes | Client ID from your Entra ID App Registration — protects `/admin` via Microsoft/Office 365 SSO |
 | `AUTH_MICROSOFT_ENTRA_ID_SECRET` | Yes | Client secret value from the same App Registration |
-| `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | Yes | `https://login.microsoftonline.com/<tenant ID>/v2.0/` |
+| `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | Yes | `https://login.microsoftonline.com/<tenant ID>/v2.0` (no trailing slash) |
 | `ANTHROPIC_API_KEY` | No | Only needed for the "Summarize with AI" button on `/admin` |
 
 ### e) Initialize the database schema
