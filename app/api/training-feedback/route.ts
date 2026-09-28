@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { trainingPayloadSchema } from "@/lib/types";
+import { auth } from "@/auth";
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -23,10 +29,10 @@ export async function POST(req: NextRequest) {
     const sql = getSql();
     await sql`
       insert into training_feedback
-        (lang, domain, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
+        (lang, submitted_by_email, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
          wants_support, support_areas, support_other_detail, pain_point, user_agent)
       values
-        (${p.lang}, ${p.domain}, ${p.easeSubmitResults}, ${p.easeEditKpis}, ${p.easeDeptScorecard}, ${p.easeKira},
+        (${p.lang}, ${session.user.email}, ${p.easeSubmitResults}, ${p.easeEditKpis}, ${p.easeDeptScorecard}, ${p.easeKira},
          ${p.wantsSupport}, ${p.supportAreas}, ${p.supportOtherDetail || null}, ${p.painPoint || null},
          ${req.headers.get("user-agent") || null})
     `;

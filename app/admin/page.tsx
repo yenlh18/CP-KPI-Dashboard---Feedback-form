@@ -11,16 +11,16 @@ export const dynamic = "force-dynamic";
 async function getData() {
   const sql = getSql();
   const feedback = (await sql`
-    select id, created_at, lang, domain, overall, overall_feedback,
+    select id, created_at, lang, submitted_by_email, overall, overall_feedback,
            start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note
     from feedback_responses order by created_at desc limit 100
   `) as unknown as FeedbackRow[];
   const bugs = (await sql`
-    select id, created_at, lang, issue, where_tags, domain, screenshot_urls
+    select id, created_at, lang, issue, where_tags, submitted_by_email, screenshot_urls
     from bug_reports order by created_at desc limit 100
   `) as unknown as BugRow[];
   const training = (await sql`
-    select id, created_at, lang, domain, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
+    select id, created_at, lang, submitted_by_email, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
            wants_support, support_areas, support_other_detail, pain_point
     from training_feedback order by created_at desc limit 100
   `) as unknown as TrainingFeedbackRow[];
@@ -106,7 +106,7 @@ export default async function AdminPage() {
             <thead className="bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500">
               <tr>
                 <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2 min-w-[140px]">{q.q_dept}</th>
+                <th className="px-3 py-2 min-w-[180px]">Email</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_overall}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_start_clarity}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.q_clarity_kpi}</th>
@@ -122,7 +122,9 @@ export default async function AdminPage() {
               {feedback.map((r) => (
                 <tr key={r.id}>
                   <td className="whitespace-nowrap px-3 py-2 text-neutral-500">{fmtDate(r.created_at)}</td>
-                  <td className="px-3 py-2 font-medium text-neutral-900">{r.domain}</td>
+                  <td className="px-3 py-2 font-medium text-neutral-900">
+                    {r.submitted_by_email || <span className="text-neutral-400">—</span>}
+                  </td>
                   <td className="px-3 py-2">
                     <Score v={r.overall} />
                   </td>
@@ -182,7 +184,7 @@ export default async function AdminPage() {
             <thead className="bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500">
               <tr>
                 <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2 min-w-[140px]">{q.bug_domain}</th>
+                <th className="px-3 py-2 min-w-[180px]">Email</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.bug_where}</th>
                 <th className="px-3 py-2 min-w-[220px]">{q.bug_issue}</th>
                 <th className="px-3 py-2">{q.bug_screenshot}</th>
@@ -192,7 +194,7 @@ export default async function AdminPage() {
               {bugs.map((b) => (
                 <tr key={b.id}>
                   <td className="whitespace-nowrap px-3 py-2 text-neutral-500">{fmtDate(b.created_at)}</td>
-                  <td className="px-3 py-2 font-medium text-neutral-900">{b.domain || "—"}</td>
+                  <td className="px-3 py-2 font-medium text-neutral-900">{b.submitted_by_email || "—"}</td>
                   <td className="px-3 py-2 text-neutral-600">{b.where_tags?.join(", ") || "—"}</td>
                   <td className="max-w-md px-3 py-2 text-neutral-600">{b.issue}</td>
                   <td className="px-3 py-2">
@@ -244,7 +246,7 @@ export default async function AdminPage() {
             <thead className="bg-neutral-50 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500">
               <tr>
                 <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2 min-w-[140px]">{q.q_dept}</th>
+                <th className="px-3 py-2 min-w-[180px]">Email</th>
                 <th className="px-3 py-2 min-w-[160px]">{q.tr_feature_submit_results}</th>
                 <th className="px-3 py-2 min-w-[160px]">{q.tr_feature_edit_kpis}</th>
                 <th className="px-3 py-2 min-w-[160px]">{q.tr_feature_dept_scorecard}</th>
@@ -258,7 +260,9 @@ export default async function AdminPage() {
               {training.map((t) => (
                 <tr key={t.id}>
                   <td className="whitespace-nowrap px-3 py-2 text-neutral-500">{fmtDate(t.created_at)}</td>
-                  <td className="px-3 py-2 font-medium text-neutral-900">{t.domain}</td>
+                  <td className="px-3 py-2 font-medium text-neutral-900">
+                    {t.submitted_by_email || <span className="text-neutral-400">—</span>}
+                  </td>
                   <td className="px-3 py-2">
                     <EaseScore v={t.ease_submit_results} />
                   </td>

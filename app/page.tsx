@@ -1,5 +1,7 @@
 import FeedbackApp from "@/components/FeedbackApp";
+import { auth } from "@/auth";
 
-export default function Page() {
-  return <FeedbackApp />;
+export default async function Page() {
+  const session = await auth();
+  return <FeedbackApp userEmail={session?.user?.email ?? null} />;
 }

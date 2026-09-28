@@ -42,8 +42,6 @@ export const copy = {
     tabASub: "Đôi nét về Anh/Chị và cảm nhận tổng thể sau khi dùng Dashboard.",
     tabBSub: "Các câu hỏi chi tiết hơn về trải nghiệm sử dụng — tất cả đều không bắt buộc.",
 
-    q_dept: "Domain của Anh/Chị",
-    q_dept_ph: "Ví dụ: HR, S&I, DTO…",
     q_overall:
       "Nhìn chung, Anh/Chị thấy việc sử dụng Dashboard trong kỳ cập nhật vừa rồi có dễ dàng và thuận tiện không?",
     q_overall_feedback: "Chia sẻ trải nghiệm của Anh/Chị",
@@ -105,9 +103,6 @@ export const copy = {
     bug_screenshot_badtype: "Chỉ nhận file PNG hoặc JPG.",
     bug_screenshot_hint: (n: number) => `PNG / JPG · ≤10MB mỗi ảnh · Tối đa ${n} ảnh`,
     bug_screenshot_limit: (n: number) => `Anh/Chị chỉ có thể đính kèm tối đa ${n} ảnh.`,
-    bug_domain: "Domain của Anh/Chị để team hỗ trợ thêm",
-    bug_domain_ph: "Ví dụ: HR, S&I, DTO…",
-
     scaleEase: [
       { v: 1, e: "😣", label: "Rất khó" },
       { v: 2, e: "🙁", label: "Khó" },
@@ -186,8 +181,6 @@ export const copy = {
     tabASub: "A few details about you and your overall experience.",
     tabBSub: "More detailed questions about your experience — all optional.",
 
-    q_dept: "Your domain",
-    q_dept_ph: "E.g. HR, S&I, DTO…",
     q_overall: "Overall, was using the Dashboard this update cycle easy and convenient?",
     q_overall_feedback: "Share your experience",
     q_overall_feedback_ph: "Share your experience…",
@@ -248,9 +241,6 @@ export const copy = {
     bug_screenshot_badtype: "Only PNG or JPG files are accepted.",
     bug_screenshot_hint: (n: number) => `PNG / JPG · ≤10MB each · Up to ${n} images`,
     bug_screenshot_limit: (n: number) => `You can attach up to ${n} images.`,
-    bug_domain: "Your domain so the team can follow up",
-    bug_domain_ph: "E.g. HR, S&I, DTO…",
-
     scaleEase: [
       { v: 1, e: "😣", label: "Very hard" },
       { v: 2, e: "🙁", label: "Hard" },

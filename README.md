@@ -4,10 +4,17 @@ A small Next.js app for collecting feedback and bug reports on the CP KPI
 Dashboard, with responses stored in a Neon (serverless Postgres) database and
 an admin view with CSV export and an optional AI summary.
 
-- **Landing page** — two entry points: Share feedback / Report a bug, VI/EN toggle
-- **Feedback form** — 2 steps (About & overall feel, Core tasks), 1–5 emoji scales
+- The whole app is protected by Microsoft Entra ID (Office 365) SSO — no
+  anonymous access. Every submission is tagged with the signed-in user's email
+  automatically (no self-reported "which department" field).
+- **Landing page** — three entry points: Training feedback / Share feedback /
+  Report a bug, VI/EN toggle
+- **Feedback form** — 2 tabs (Overall feel, Details), 1–5 emoji scales
 - **Bug report** — single page, only the issue description is required
-- **`/admin`** — password-protected table view, CSV export, "Summarize with AI"
+- **Training feedback** — single page covering per-feature ease ratings and an
+  optional 1:1 support request
+- **`/admin`** — same SSO, plus an email allow-list — table view, CSV export,
+  "Summarize with AI"
 
 ## 1. Requirements
 
@@ -92,28 +99,36 @@ and the admin view at `https://<your-project>.vercel.app/admin`.
 
 ## 4. How data is stored
 
-Two tables (see `db/schema.sql`):
+Three tables (see `db/schema.sql`):
 
-- `feedback_responses` — domain, overall score (1–5), optional open feedback,
-  three optional 1–5 scores + note for "core tasks"
-- `bug_reports` — issue description (required), screens affected, domain
+- `feedback_responses` — overall score (1–5), optional open feedback, plus
+  the tab-B detail scores/notes
+- `bug_reports` — issue description (required), screens affected
+- `training_feedback` — per-feature ease ratings, 1:1 support request
 
-Both are inserted via `POST /api/feedback` and `POST /api/bug`, validated
-server-side with `zod` (`lib/types.ts`).
+Every row also carries `submitted_by_email`, taken server-side from the
+authenticated Entra ID session — never trusted from the client payload.
 
-## 5. Admin view (`/admin`)
+Inserted via `POST /api/feedback`, `POST /api/bug`, `POST
+/api/training-feedback`, validated server-side with `zod` (`lib/types.ts`).
 
-- Protected by Microsoft Entra ID (Office 365) SSO via [Auth.js](https://authjs.dev)
-  (`auth.ts`, `middleware.ts`) — anyone in the configured tenant can sign in, but
-  only emails listed in `ADMIN_ALLOWED_EMAILS` are authorized to view the
-  dashboard (others get a 403 after signing in). Requesting a new App
-  Registration? The redirect URI to give the identity team is
-  `https://<your-domain>/api/auth/callback/microsoft-entra-id`. This is a pure
-  sign-in flow (OIDC `openid profile email offline_access` scopes only) — no
-  Microsoft Graph API permission is requested. Note: your tenant may require an
-  admin to click **"Grant admin consent"** on the App Registration once before
-  non-admin users can sign in without an approval prompt.
-- Shows the latest 100 rows of each table
+## 5. Authentication (whole app + `/admin`)
+
+- The entire app — landing page, all three forms, and their POST APIs — is
+  protected by Microsoft Entra ID (Office 365) SSO via
+  [Auth.js](https://authjs.dev) (`auth.ts`, `middleware.ts`). Anyone in the
+  configured tenant can sign in and submit feedback.
+- `/admin` has an extra layer: only emails listed in `ADMIN_ALLOWED_EMAILS`
+  are authorized to view the dashboard (everyone else gets a 403 after
+  signing in).
+- Requesting a new App Registration? The redirect URI to give the identity
+  team is `https://<your-domain>/api/auth/callback/microsoft-entra-id`. This
+  is a pure sign-in flow (OIDC `openid profile email offline_access` scopes
+  only) — no Microsoft Graph API permission is requested.
+- Your tenant may require an admin to click **"Grant admin consent"** on the
+  App Registration once before non-admin users can sign in without an
+  approval prompt.
+- `/admin` shows the latest 100 rows of each table
 - **Export CSV** — downloads all rows (not just the 100 shown) as CSV
 - **Summarize with AI** — sends the latest 200 rows to Claude
   (`claude-sonnet-5`) and displays a short written summary. Requires
@@ -122,9 +137,10 @@ server-side with `zod` (`lib/types.ts`).
 
 ## 6. Notes / things you may want to change
 
-- **Screenshot upload** on the bug report page is decorative in this version
-  (clicking it just shows a message) — wiring it up to real storage (e.g.
-  Vercel Blob) is a natural next step if you want it.
+- **Screenshot upload** on the bug report page uploads directly to Vercel
+  Blob (up to 5 images, ≤10MB each) — requires the `BLOB_READ_WRITE_TOKEN`
+  env var, which Vercel sets automatically once a Blob store is attached to
+  the project (Storage tab → Create → Blob).
 - The **header image** lives at `public/header.jpg` (extracted from the
   original mockup) — swap it for an updated banner any time.
 - Brand colors (`#F05A22` / `#ec9224` / `#ed5a26`) are defined as CSS

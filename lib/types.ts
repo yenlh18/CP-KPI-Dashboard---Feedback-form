@@ -4,7 +4,6 @@ export const scoreSchema = z.number().int().min(1).max(5);
 
 export const feedbackPayloadSchema = z.object({
   lang: z.enum(["vi", "en"]),
-  domain: z.string().trim().min(1).max(200),
   overall: scoreSchema,
   overallFeedback: z.string().trim().max(4000).optional().default(""),
   startClarity: scoreSchema.optional().nullable(),
@@ -21,7 +20,6 @@ export const bugPayloadSchema = z.object({
   lang: z.enum(["vi", "en"]),
   issue: z.string().trim().min(1).max(4000),
   whereTags: z.array(z.string()).max(20).optional().default([]),
-  domain: z.string().trim().max(200).optional().default(""),
   screenshotUrls: z
     .array(
       z
@@ -44,7 +42,6 @@ export const easeSkipSchema = z.number().int().min(0).max(5);
 export const trainingPayloadSchema = z
   .object({
     lang: z.enum(["vi", "en"]),
-    domain: z.string().trim().min(1).max(200),
     easeSubmitResults: easeSkipSchema,
     easeEditKpis: easeSkipSchema,
     easeDeptScorecard: easeSkipSchema,
@@ -71,7 +68,7 @@ export interface FeedbackRow {
   id: string;
   created_at: string;
   lang: string;
-  domain: string;
+  submitted_by_email: string | null;
   overall: number;
   overall_feedback: string | null;
   start_clarity: number | null;
@@ -87,9 +84,9 @@ export interface BugRow {
   id: string;
   created_at: string;
   lang: string;
+  submitted_by_email: string | null;
   issue: string;
   where_tags: string[];
-  domain: string | null;
   screenshot_urls: string[];
 }
 
@@ -97,7 +94,7 @@ export interface TrainingFeedbackRow {
   id: string;
   created_at: string;
   lang: string;
-  domain: string;
+  submitted_by_email: string | null;
   ease_submit_results: number;
   ease_edit_kpis: number;
   ease_dept_scorecard: number;

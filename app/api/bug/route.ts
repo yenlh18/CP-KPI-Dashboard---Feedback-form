@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { bugPayloadSchema } from "@/lib/types";
+import { auth } from "@/auth";
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -23,9 +29,9 @@ export async function POST(req: NextRequest) {
     const sql = getSql();
     await sql`
       insert into bug_reports
-        (lang, issue, where_tags, domain, screenshot_urls, user_agent)
+        (lang, issue, where_tags, submitted_by_email, screenshot_urls, user_agent)
       values
-        (${p.lang}, ${p.issue}, ${p.whereTags}, ${p.domain || null}, ${p.screenshotUrls}, ${req.headers.get("user-agent") || null})
+        (${p.lang}, ${p.issue}, ${p.whereTags}, ${session.user.email}, ${p.screenshotUrls}, ${req.headers.get("user-agent") || null})
     `;
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {

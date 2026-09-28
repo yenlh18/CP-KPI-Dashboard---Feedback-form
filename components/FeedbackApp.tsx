@@ -18,7 +18,6 @@ type View = "landing" | "feedback" | "bug" | "training" | "thanks";
 type ThanksKind = "feedback" | "bug" | "training";
 
 interface FeedbackFormState {
-  dept: string;
   overall: number | null;
   overallFeedback: string;
   startClarity: number | null;
@@ -33,12 +32,10 @@ interface FeedbackFormState {
 interface BugFormState {
   issue: string;
   whereTags: string[];
-  domain: string;
   screenshots: Screenshot[];
 }
 
 interface TrainingFormState {
-  dept: string;
   easeSubmitResults: number | null;
   easeEditKpis: number | null;
   easeDeptScorecard: number | null;
@@ -53,7 +50,6 @@ const FEEDBACK_STEPS = 2;
 const LANG_STORAGE_KEY = "cpkpi_fb_lang";
 
 const emptyFeedback: FeedbackFormState = {
-  dept: "",
   overall: null,
   overallFeedback: "",
   startClarity: null,
@@ -68,12 +64,10 @@ const emptyFeedback: FeedbackFormState = {
 const emptyBug: BugFormState = {
   issue: "",
   whereTags: [],
-  domain: "",
   screenshots: [],
 };
 
 const emptyTraining: TrainingFormState = {
-  dept: "",
   easeSubmitResults: null,
   easeEditKpis: null,
   easeDeptScorecard: null,
@@ -191,12 +185,14 @@ function Shell({
   lang,
   setLangState,
   badge,
+  userEmail,
 }: {
   children: React.ReactNode;
   compactHero?: boolean;
   lang: Lang;
   setLangState: (l: Lang) => void;
   badge: string;
+  userEmail: string | null;
 }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-16">
@@ -221,6 +217,14 @@ function Shell({
           </button>
         </div>
       </div>
+      {userEmail && (
+        <div className="text-xs mb-3" style={{ color: "var(--ink-3)" }}>
+          {userEmail} ·{" "}
+          <a href="/api/auth/signout?callbackUrl=/" style={{ color: "var(--brand)" }}>
+            Sign out
+          </a>
+        </div>
+      )}
       <header className={`hero mb-6 ${compactHero ? "compact" : ""}`}>
         <Image src="/header.jpg" alt="CP KPI Dashboard" width={1600} height={600} priority className="w-full h-auto" />
       </header>
@@ -232,7 +236,7 @@ function Shell({
   );
 }
 
-export default function FeedbackApp() {
+export default function FeedbackApp({ userEmail }: { userEmail: string | null }) {
   const [lang, setLangState] = useState<Lang>("vi");
   const [view, setView] = useState<View>("landing");
   const [step, setStep] = useState(0);
@@ -280,12 +284,11 @@ export default function FeedbackApp() {
     goto("landing");
   }
 
-  const step0Valid = feedback.dept.trim() !== "" && feedback.overall !== null;
+  const step0Valid = feedback.overall !== null;
   const bugValid = bug.issue.trim() !== "";
 
   const trainingOtherLabel = c.tr_support_areas_opts[c.tr_support_areas_opts.length - 1];
   const trainingValid =
-    training.dept.trim() !== "" &&
     training.easeSubmitResults !== null &&
     training.easeEditKpis !== null &&
     training.easeDeptScorecard !== null &&
@@ -304,7 +307,6 @@ export default function FeedbackApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lang,
-          domain: feedback.dept,
           overall: feedback.overall,
           overallFeedback: feedback.overallFeedback,
           startClarity: feedback.startClarity,
@@ -339,7 +341,6 @@ export default function FeedbackApp() {
           lang,
           issue: bug.issue,
           whereTags: bug.whereTags,
-          domain: bug.domain,
           screenshotUrls: bug.screenshots.map((s) => s.url),
         }),
       });
@@ -364,7 +365,6 @@ export default function FeedbackApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lang,
-          domain: training.dept,
           easeSubmitResults: training.easeSubmitResults,
           easeEditKpis: training.easeEditKpis,
           easeDeptScorecard: training.easeDeptScorecard,
@@ -437,7 +437,7 @@ export default function FeedbackApp() {
   // ---------- Landing ----------
   if (view === "landing") {
     return (
-      <Shell lang={lang} setLangState={setLangState} badge={c.badge}>
+      <Shell lang={lang} setLangState={setLangState} badge={c.badge} userEmail={userEmail}>
         <section className="step-enter">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3" style={{ color: "var(--ink)" }}>
             {c.landingTitle}
@@ -523,7 +523,7 @@ export default function FeedbackApp() {
     const canAdvance = step === 0 ? step0Valid : true;
 
     return (
-      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
+      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge} userEmail={userEmail}>
         <section className="step-enter" key={`s${step}`}>
           <div className="mb-6">
             <div className="flex items-center justify-between text-xs mb-2" style={{ color: "var(--ink-3)" }}>
@@ -547,16 +547,6 @@ export default function FeedbackApp() {
                 <p className="text-sm sm:text-base" style={{ color: "var(--ink-2)" }}>
                   {c.tabASub}
                 </p>
-              </div>
-              <div className="card p-5 sm:p-6 mb-4">
-                <LabelBlock text={c.q_dept} required />
-                <input
-                  className="input mt-3"
-                  type="text"
-                  placeholder={c.q_dept_ph}
-                  value={feedback.dept}
-                  onChange={(e) => setFeedback((f) => ({ ...f, dept: e.target.value }))}
-                />
               </div>
               <div className="card p-5 sm:p-6 mb-4">
                 <LabelBlock text={c.q_overall} required />
@@ -691,7 +681,7 @@ export default function FeedbackApp() {
   // ---------- Bug report ----------
   if (view === "bug") {
     return (
-      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
+      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge} userEmail={userEmail}>
         <section className="step-enter">
           <div className="mb-6">
             <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: "var(--ink)" }}>
@@ -773,17 +763,6 @@ export default function FeedbackApp() {
             )}
           </div>
 
-          <div className="card p-5 sm:p-6 mb-4">
-            <LabelBlock text={c.bug_domain} />
-            <input
-              className="input mt-3"
-              type="text"
-              placeholder={c.bug_domain_ph}
-              value={bug.domain}
-              onChange={(e) => setBug((b) => ({ ...b, domain: e.target.value }))}
-            />
-          </div>
-
           <div className="flex items-center justify-between gap-3 mt-6">
             <button className="btn-ghost text-sm" onClick={() => goto("landing")}>
               ← {c.back}
@@ -805,7 +784,7 @@ export default function FeedbackApp() {
   // ---------- Training feedback ----------
   if (view === "training") {
     return (
-      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
+      <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge} userEmail={userEmail}>
         <section className="step-enter">
           <div className="mb-6">
             <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: "var(--ink)" }}>
@@ -814,17 +793,6 @@ export default function FeedbackApp() {
             <p className="text-sm sm:text-base" style={{ color: "var(--ink-2)" }}>
               {c.trainingSub}
             </p>
-          </div>
-
-          <div className="card p-5 sm:p-6 mb-4">
-            <LabelBlock text={c.q_dept} required />
-            <input
-              className="input mt-3"
-              type="text"
-              placeholder={c.q_dept_ph}
-              value={training.dept}
-              onChange={(e) => setTraining((t) => ({ ...t, dept: e.target.value }))}
-            />
           </div>
 
           <div className="card p-5 sm:p-6 mb-4">
@@ -967,7 +935,7 @@ export default function FeedbackApp() {
   const thanksSub =
     thanksKind === "bug" ? c.thanksSubBug : thanksKind === "training" ? c.thanksSubTraining : c.thanksSubFb;
   return (
-    <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge}>
+    <Shell compactHero lang={lang} setLangState={setLangState} badge={c.badge} userEmail={userEmail}>
       <section className="step-enter text-center">
         <div className="card p-8 sm:p-12">
           {!isBug && <div className="text-6xl mb-4">{thanksKind === "training" ? "🎓" : "🌟"}</div>}

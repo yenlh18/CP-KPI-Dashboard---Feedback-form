@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     if (kind === "training") {
       const rows = (await sql`
-        select created_at, lang, domain, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
+        select created_at, lang, submitted_by_email, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
                wants_support, support_areas, support_other_detail, pain_point
         from training_feedback order by created_at desc limit 200
       `) as unknown as TrainingFeedbackRow[];
@@ -42,14 +42,14 @@ export async function POST(req: NextRequest) {
                 r.support_other_detail ? `; other: ${r.support_other_detail}` : ""
               })`
             : "does not want 1:1 support";
-          return `${i + 1}. [${r.domain}] ease(0=not tried,1-5): ${ease}\n   ${support}${
+          return `${i + 1}. [${r.submitted_by_email ?? "—"}] ease(0=not tried,1-5): ${ease}\n   ${support}${
             r.pain_point ? `\n   pain point: ${r.pain_point}` : ""
           }`;
         })
         .join("\n\n");
     } else if (kind === "bug") {
       const rows = (await sql`
-        select created_at, lang, issue, where_tags, domain
+        select created_at, lang, issue, where_tags, submitted_by_email
         from bug_reports order by created_at desc limit 200
       `) as unknown as BugRow[];
       if (rows.length === 0) {
@@ -58,14 +58,14 @@ export async function POST(req: NextRequest) {
       promptData = rows
         .map(
           (r, i) =>
-            `${i + 1}. [${r.created_at}] (${r.lang}, domain: ${r.domain ?? "—"}, screens: ${
+            `${i + 1}. [${r.created_at}] (${r.lang}, from: ${r.submitted_by_email ?? "—"}, screens: ${
               r.where_tags?.join(", ") || "—"
             })\n${r.issue}`
         )
         .join("\n\n");
     } else {
       const rows = (await sql`
-        select created_at, lang, domain, overall, overall_feedback,
+        select created_at, lang, submitted_by_email, overall, overall_feedback,
                start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note
         from feedback_responses order by created_at desc limit 200
       `) as unknown as FeedbackRow[];
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
             .filter(Boolean)
             .join(", ");
           const notes = [r.overall_feedback, r.change_note].filter(Boolean).join(" | ");
-          return `${i + 1}. [${r.domain}] scores(1-5): ${scores}${notes ? `\n   notes: ${notes}` : ""}`;
+          return `${i + 1}. [${r.submitted_by_email ?? "—"}] scores(1-5): ${scores}${notes ? `\n   notes: ${notes}` : ""}`;
         })
         .join("\n\n");
     }

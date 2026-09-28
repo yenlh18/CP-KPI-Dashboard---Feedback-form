@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { feedbackPayloadSchema } from "@/lib/types";
+import { auth } from "@/auth";
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -23,9 +29,9 @@ export async function POST(req: NextRequest) {
     const sql = getSql();
     await sql`
       insert into feedback_responses
-        (lang, domain, overall, overall_feedback, start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note, user_agent)
+        (lang, submitted_by_email, overall, overall_feedback, start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note, user_agent)
       values
-        (${p.lang}, ${p.domain}, ${p.overall}, ${p.overallFeedback || null},
+        (${p.lang}, ${session.user.email}, ${p.overall}, ${p.overallFeedback || null},
          ${p.startClarity ?? null}, ${p.clarityKpi ?? null}, ${p.clarityScore ?? null}, ${p.changeFlow ?? null},
          ${p.supportClarity ?? null}, ${p.timeSaved ?? null},
          ${p.changeNote || null}, ${req.headers.get("user-agent") || null})

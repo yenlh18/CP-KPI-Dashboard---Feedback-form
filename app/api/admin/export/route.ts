@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const sql = getSql();
     if (kind === "bug") {
       const rows = (await sql`
-        select id, created_at, lang, issue, where_tags, domain, screenshot_urls
+        select id, created_at, lang, issue, where_tags, submitted_by_email, screenshot_urls
         from bug_reports order by created_at desc
       `) as unknown as BugRow[];
       const csv = toCsv(withGmt7Dates(rows));
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     if (kind === "training") {
       const rows = (await sql`
-        select id, created_at, lang, domain, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
+        select id, created_at, lang, submitted_by_email, ease_submit_results, ease_edit_kpis, ease_dept_scorecard, ease_kira,
                wants_support, support_areas, support_other_detail, pain_point
         from training_feedback order by created_at desc
       `) as unknown as TrainingFeedbackRow[];
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     }
 
     const rows = (await sql`
-      select id, created_at, lang, domain, overall, overall_feedback,
+      select id, created_at, lang, submitted_by_email, overall, overall_feedback,
              start_clarity, clarity_kpi, clarity_score, change_flow, support_clarity, time_saved, change_note
       from feedback_responses order by created_at desc
     `) as unknown as FeedbackRow[];

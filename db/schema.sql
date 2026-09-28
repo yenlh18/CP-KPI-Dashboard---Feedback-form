@@ -7,7 +7,7 @@ create table if not exists feedback_responses (
   id                 uuid primary key default gen_random_uuid(),
   created_at         timestamptz not null default now(),
   lang               text not null,
-  domain             text not null,
+  submitted_by_email text,
   overall            smallint not null check (overall between 1 and 5),
   overall_feedback   text,
   start_clarity      smallint check (start_clarity between 1 and 5),
@@ -33,7 +33,7 @@ create table if not exists bug_reports (
   lang               text not null,
   issue              text not null,
   where_tags         text[] not null default '{}',
-  domain             text,
+  submitted_by_email text,
   screenshot_urls    text[] not null default '{}',
   user_agent         text
 );
@@ -48,7 +48,7 @@ create table if not exists training_feedback (
   id                     uuid primary key default gen_random_uuid(),
   created_at             timestamptz not null default now(),
   lang                   text not null,
-  domain                 text not null,
+  submitted_by_email     text,
   ease_submit_results    smallint not null check (ease_submit_results between 0 and 5),
   ease_edit_kpis         smallint not null check (ease_edit_kpis between 0 and 5),
   ease_dept_scorecard    smallint not null check (ease_dept_scorecard between 0 and 5),
@@ -59,6 +59,17 @@ create table if not exists training_feedback (
   pain_point             text,
   user_agent             text
 );
+
+-- SSO rollout: the whole app now requires Entra ID sign-in, so every
+-- submission is tagged with the authenticated submitter's email instead of a
+-- self-reported department ("domain"). Existing pre-SSO rows simply keep
+-- submitted_by_email = null.
+alter table feedback_responses add column if not exists submitted_by_email text;
+alter table feedback_responses drop column if exists domain;
+alter table bug_reports add column if not exists submitted_by_email text;
+alter table bug_reports drop column if exists domain;
+alter table training_feedback add column if not exists submitted_by_email text;
+alter table training_feedback drop column if exists domain;
 
 create index if not exists feedback_responses_created_at_idx on feedback_responses (created_at desc);
 create index if not exists bug_reports_created_at_idx on bug_reports (created_at desc);
