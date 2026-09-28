@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { upload } from "@vercel/blob/client";
 import { copy, type Lang } from "@/lib/copy";
+import { signOutAction } from "@/app/actions";
 
 const MAX_SCREENSHOT_BYTES = 10 * 1024 * 1024;
 const MAX_SCREENSHOTS = 5;
@@ -220,9 +221,11 @@ function Shell({
       {userEmail && (
         <div className="text-xs mb-3" style={{ color: "var(--ink-3)" }}>
           {userEmail} ·{" "}
-          <a href="/api/auth/signout?callbackUrl=/" style={{ color: "var(--brand)" }}>
-            Sign out
-          </a>
+          <form action={signOutAction.bind(null, "/")} className="inline">
+            <button type="submit" style={{ color: "var(--brand)" }}>
+              Sign out
+            </button>
+          </form>
         </div>
       )}
       <header className={`hero mb-6 ${compactHero ? "compact" : ""}`}>

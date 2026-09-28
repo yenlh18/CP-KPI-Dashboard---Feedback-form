@@ -3,6 +3,7 @@ import type { BugRow, FeedbackRow, TrainingFeedbackRow } from "@/lib/types";
 import AdminSummarize from "@/components/AdminSummarize";
 import { copy } from "@/lib/copy";
 import { auth } from "@/auth";
+import { signOutAction } from "@/app/actions";
 
 const q = copy.vi;
 
@@ -70,9 +71,11 @@ export default async function AdminPage() {
           <div className="text-sm text-neutral-500">
             Signed in as <span className="font-medium text-neutral-700">{session.user.email ?? session.user.name}</span>{" "}
             ·{" "}
-            <a href="/api/auth/signout?callbackUrl=/admin" className="text-[#F05A22] hover:underline">
-              Sign out
-            </a>
+            <form action={signOutAction.bind(null, "/admin")} className="inline">
+              <button type="submit" className="text-[#F05A22] hover:underline">
+                Sign out
+              </button>
+            </form>
           </div>
         )}
       </div>

@@ -28,7 +28,7 @@ export default auth((req) => {
     if (isApi) {
       return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }
-    const signInUrl = new URL("/api/auth/signin", req.nextUrl.origin);
+    const signInUrl = new URL("/login", req.nextUrl.origin);
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
   }
