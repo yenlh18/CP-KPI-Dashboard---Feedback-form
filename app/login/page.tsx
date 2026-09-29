@@ -39,11 +39,11 @@ export default async function LoginPage({
           width={320}
           height={320}
           priority
-          className="w-[135px] h-[135px] sm:w-[154px] sm:h-[154px] mx-auto mb-4"
+          className="w-[135px] h-[135px] sm:w-[154px] sm:h-[154px] mx-auto mb-2"
         />
 
         <div className="card p-12 sm:p-14 text-left">
-          <h1 className="text-4xl font-normal mb-6" style={{ color: "var(--ink)" }}>
+          <h1 className="text-4xl font-extrabold mb-6" style={{ color: "var(--ink)" }}>
             Sign in
           </h1>
           <p className="text-lg font-semibold mb-10" style={{ color: "var(--ink-2)" }}>
