@@ -1,8 +1,9 @@
+import Image from "next/image";
 import { signIn } from "@/auth";
 
 function MicrosoftLogo() {
   return (
-    <svg width="24" height="24" viewBox="0 0 21 21" aria-hidden="true">
+    <svg width="26" height="26" viewBox="0 0 21 21" aria-hidden="true">
       <rect x="1" y="1" width="9" height="9" fill="#f25022" />
       <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
       <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
@@ -31,25 +32,21 @@ export default async function LoginPage({
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md text-center step-enter">
-        <div
-          className="text-6xl font-extrabold mb-2"
-          style={{ color: "var(--brand)", letterSpacing: "-0.02em", transform: "skewX(-4deg)" }}
-        >
-          VNG
-        </div>
-        <div
-          className="text-sm font-semibold mb-10"
-          style={{ color: "var(--brand-3)", letterSpacing: "0.08em" }}
-        >
-          embracing challenges
-        </div>
+      <div className="w-full max-w-lg text-center step-enter">
+        <Image
+          src="/vng-logo.png"
+          alt="VNG — embracing challenges"
+          width={320}
+          height={320}
+          priority
+          className="w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-8"
+        />
 
-        <div className="card p-10 sm:p-12 text-left">
-          <h1 className="text-3xl font-extrabold mb-2" style={{ color: "var(--ink)" }}>
+        <div className="card p-12 sm:p-14 text-left">
+          <h1 className="text-4xl font-extrabold mb-3" style={{ color: "var(--ink)" }}>
             Sign in
           </h1>
-          <p className="text-base font-semibold mb-8" style={{ color: "var(--ink-2)" }}>
+          <p className="text-lg font-semibold mb-10" style={{ color: "var(--ink-2)" }}>
             Feedback - CP KPI Dashboard
           </p>
 
@@ -70,7 +67,7 @@ export default async function LoginPage({
           >
             <button
               type="submit"
-              className="w-full px-6 py-4 rounded-xl text-base font-semibold flex items-center justify-center gap-3"
+              className="w-full px-6 py-5 rounded-xl text-lg font-semibold flex items-center justify-center gap-3"
               style={{
                 background: "var(--card)",
                 border: "1px solid var(--line-2)",
@@ -83,7 +80,7 @@ export default async function LoginPage({
           </form>
         </div>
 
-        <div className="text-sm mt-6" style={{ color: "var(--ink-3)" }}>
+        <div className="text-base mt-8" style={{ color: "var(--ink-3)" }}>
           SSO · Microsoft Entra ID
         </div>
       </div>
