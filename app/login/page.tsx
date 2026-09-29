@@ -2,7 +2,7 @@ import { signIn } from "@/auth";
 
 function MicrosoftLogo() {
   return (
-    <svg width="20" height="20" viewBox="0 0 21 21" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 21 21" aria-hidden="true">
       <rect x="1" y="1" width="9" height="9" fill="#f25022" />
       <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
       <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
@@ -31,26 +31,26 @@ export default async function LoginPage({
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm text-center step-enter">
+      <div className="w-full max-w-md text-center step-enter">
         <div
-          className="text-4xl font-extrabold mb-1"
+          className="text-6xl font-extrabold mb-2"
           style={{ color: "var(--brand)", letterSpacing: "-0.02em", transform: "skewX(-4deg)" }}
         >
           VNG
         </div>
         <div
-          className="text-xs font-semibold mb-8"
+          className="text-sm font-semibold mb-10"
           style={{ color: "var(--brand-3)", letterSpacing: "0.08em" }}
         >
           embracing challenges
         </div>
 
-        <div className="card p-8 sm:p-10 text-left">
-          <h1 className="text-2xl font-extrabold mb-1" style={{ color: "var(--ink)" }}>
+        <div className="card p-10 sm:p-12 text-left">
+          <h1 className="text-3xl font-extrabold mb-2" style={{ color: "var(--ink)" }}>
             Sign in
           </h1>
-          <p className="text-sm font-semibold mb-6" style={{ color: "var(--ink-2)" }}>
-            Feedback/Bug reporting - CP KPI Dashboard
+          <p className="text-base font-semibold mb-8" style={{ color: "var(--ink-2)" }}>
+            Feedback - CP KPI Dashboard
           </p>
 
           {errorMessage && (
@@ -70,7 +70,7 @@ export default async function LoginPage({
           >
             <button
               type="submit"
-              className="w-full px-5 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-3"
+              className="w-full px-6 py-4 rounded-xl text-base font-semibold flex items-center justify-center gap-3"
               style={{
                 background: "var(--card)",
                 border: "1px solid var(--line-2)",
@@ -81,14 +81,9 @@ export default async function LoginPage({
               Sign in with VNG account
             </button>
           </form>
-
-          <p className="text-xs mt-4" style={{ color: "var(--ink-3)" }}>
-            Use your Microsoft account (@vng.com.vn). Only accounts registered
-            in the directory can sign in.
-          </p>
         </div>
 
-        <div className="text-xs mt-6" style={{ color: "var(--ink-3)" }}>
+        <div className="text-sm mt-6" style={{ color: "var(--ink-3)" }}>
           SSO · Microsoft Entra ID
         </div>
       </div>
